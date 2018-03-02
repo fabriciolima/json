@@ -32,6 +32,16 @@ dependencies {
 
     // Use MySQL Connector-J
     compile 'mysql:mysql-connector-java'
+    
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-spatial
+	compile group: 'org.hibernate', name: 'hibernate-spatial', version: '5.1.0.Final'
+
+
+    compile files('javaxt-core.jar')
+    compile files('json-20160810.jar')
+    compile files('json-simple-1.1.jar')
+    compile files('jsoup-1.11.2.jar')
+    
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
