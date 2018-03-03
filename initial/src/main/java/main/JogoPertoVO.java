@@ -10,8 +10,6 @@ public class JogoPertoVO {
 	private String idPlataforma;
 	private String nomePlataforma;
 	private String distancia;
-	
-	
 	public String getEstadoDoJogo() {
 		return estadoDoJogo;
 	}
@@ -60,6 +58,7 @@ public class JogoPertoVO {
 	public void setDistancia(String distancia) {
 		this.distancia = distancia;
 	}
+	
 
 	
 }

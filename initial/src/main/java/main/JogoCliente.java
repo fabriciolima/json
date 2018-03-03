@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class JogoCliente {
@@ -15,9 +16,12 @@ public class JogoCliente {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private Integer estadoDoJogo;
-	private Long idCliente;
-	private Long idJogo;
-	private Long idPlataforma;
+	@ManyToOne
+	private Cliente cliente;
+	@ManyToOne
+	private Jogo jogo;
+	@ManyToOne
+	private Plataforma plataforma;
 	private Date dataModificado;
 	private Date dataCadastro;
 	//@Column(columnDefinition="default 0")
@@ -64,27 +68,26 @@ public class JogoCliente {
 	public void setEstadoDoJogo(Integer estadoDoJogo) {
 		this.estadoDoJogo = estadoDoJogo;
 	}
-	public Long getIdjogo() {
-		return idJogo;
+	public Cliente getCliente() {
+		return cliente;
 	}
-	public void setIdJogo(Long idJogo) {
-		this.idJogo = idJogo;
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
-	public Long getIdCliente() {
-		return idCliente;
+	public Jogo getJogo() {
+		return jogo;
 	}
-	public void setIdCliente(Long idcliente) {
-		this.idCliente = idcliente;
+	public void setJogo(Jogo jogo) {
+		this.jogo = jogo;
+	}
+	public Plataforma getPlataforma() {
+		return plataforma;
+	}
+	public void setPlataforma(Plataforma plataforma) {
+		this.plataforma = plataforma;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Long getIdPlataforma() {
-		return idPlataforma;
-	}
-	public void setIdPlataforma(Long idPlataforma) {
-		this.idPlataforma = idPlataforma;
-	}
-	
 	
 }

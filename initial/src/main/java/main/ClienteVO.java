@@ -1,34 +1,31 @@
 package main;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.NamedQuery;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 //@Spatial @Indexed 
-@Entity
-public class Cliente {
+//@Entity
+//@NamedQuery(name = "Cliente.findByLocal",
+//query = "select c from Cliente c where c.nome like '%?1%'")
+public class ClienteVO {
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String nome;
-	@Column(unique=true)
 	private String telefone;
-	@Column(columnDefinition="Geometry")
 	//@Type(type="org.hibernate.spatial.GeometryType")
 	private Geometry localizacao;
 	
-	@OneToMany(mappedBy="cliente")
-	private List<JogoCliente> listaJogoCliente;
+//	@OneToMany(mappedBy="cliente")
+//	private List<JogoCliente> listaJogoCliente;
 	
 
 	public String getNome() {
@@ -96,12 +93,8 @@ public class Cliente {
 		// TODO Auto-generated method stub
 		return id;
 	}
+	
+	
 
-	public List<JogoCliente> getListaJogoCliente() {
-		return listaJogoCliente;
-	}
-
-	public void setListaJogoCliente(List<JogoCliente> listaJogoCliente) {
-		this.listaJogoCliente = listaJogoCliente;
-	}	
+	
 }

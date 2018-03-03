@@ -1,4 +1,5 @@
 package main;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 
 import org.json.simple.JSONObject;
@@ -29,6 +31,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateFilter;
+import com.vividsolutions.jts.geom.CoordinateSequenceComparator;
+import com.vividsolutions.jts.geom.CoordinateSequenceFilter;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryComponentFilter;
+import com.vividsolutions.jts.geom.GeometryFilter;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
+
 @Controller// This means that this class is a Controller
 @RequestMapping(path="/json") // This means URL's start with /demo (after Application path)
 @CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
@@ -40,6 +53,7 @@ public class MainController {
 	@Autowired private JogoRepository jogoRepository;
 	@Autowired private JogoClienteRepository jogoClienteRepository;
 	@Autowired private ClienteRepository clienteRepository;
+	@Resource private ClienteRepositoryJPA clienteRepositoryJPA;
 	@Autowired private PlataformaRepository plataformaRepository;
 
 	//@GetMapping(path="/add") // Map ONLY GET Requests
@@ -68,9 +82,9 @@ public class MainController {
 		}
 		
 		JogoCliente jogoCliente = new JogoCliente();
-		jogoCliente.setIdCliente(clienteRepository.findById(Long.valueOf(idCliente)).getId());
-		jogoCliente.setDataCadastro(new Date());
-		jogoCliente.setIdJogo(jogo.getId());
+//		jogoCliente.setIdCliente(clienteRepository.findById(Long.valueOf(idCliente)).getId());
+//		jogoCliente.setDataCadastro(new Date());
+//		jogoCliente.setIdJogo(jogo.getId());
 		jogoCliente.setEstadoDoJogo(Integer.valueOf(estado));
 		jogoClienteRepository.save(jogoCliente);
 		
@@ -144,12 +158,63 @@ public class MainController {
 	
 	@GetMapping(path="/jogosperto")
 	@CrossOrigin(origins = "*", maxAge = 3600)
-	public @ResponseBody List<JogoPertoVO> getJogosPerto(@RequestParam String idCliente) {
-		List<JogoPertoVO> retorno = new ArrayList<JogoPertoVO>(); 
+	public @ResponseBody List<JogoPertoVO> getJogosPerto(){//@RequestParam String idCliente) {
+		List<JogoPertoVO> retorno = new ArrayList<JogoPertoVO>();
 		
-		clienteRepository.findById(id)
-		System.out.println(retorno.size());
-		//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
+		WKTReader reader = new WKTReader();
+//		
+		try {
+			System.out.println("teste");
+			Geometry ponto= reader.read("Point(15 10)");
+			System.out.println(ponto);
+			List<Object[]> list = null;
+			if(ponto != null)
+				list = clienteRepositoryJPA.procuraJogosPerto(ponto);
+			for(Object[] obj:list) {
+				String nomecliente = obj[0].toString();
+				String idcliente  = obj[1].toString();
+				String localizacao = obj[2].toString();
+				String idjogo = obj[3].toString();
+				String nomejogo = obj[4].toString();
+				String idplataforma = obj[5].toString();
+				String nomeplataforma = obj[6].toString();
+				String dist  = obj[7].toString();
+				//System.out.println(obj[8]);
+				String estadojogo = obj[8]==null?"3":obj[8].toString();
+				
+				JogoPertoVO jp = new JogoPertoVO();
+				jp.setIdCliente(idcliente);
+				jp.setIdJogo(idjogo);
+				jp.setIdPlataforma(idplataforma);
+				jp.setNomeCliente(nomecliente);
+				jp.setNomeJogo(nomejogo);
+				jp.setNomePlataforma(nomeplataforma);
+				//Integer distancia = Integer.valueOf(dist);
+				jp.setDistancia(dist.concat(" KM"));				
+				jp.setEstadoDoJogo(estadojogo);
+				retorno.add(jp);
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			return null;
+		}
+//		List<Cliente> procura = clienteRepositoryJPA.findByLocalizacao(reader.read("Point(-15 10)"));
+//		for (Cliente c:procura) {
+//			for(JogoCliente jc:c.getListaJogoCliente()) {
+//				JogoPertoVO jp = new JogoPertoVO();
+//				jp.setDistancia("0");
+//				jp.setEstadoDoJogo(jc.getEstadoDoJogo());
+//				jp.setIdCliente(jc.getCliente().getId());
+//				jp.setIdJogo(jc.getJogo().getId());
+//				jp.setIdPlataforma(jc.getPlataforma().getId());
+//				jp.setNomeCliente(c.getNome());
+//				jp.setNomeJogo(jc.getJogo().getNome());
+//				jp.setNomePlataforma(jc.getPlataforma().getNome());
+//				retorno.add(jp);
+//				
+//			}
+//		}
 		
 		return retorno;
 	}

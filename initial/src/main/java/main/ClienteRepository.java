@@ -9,9 +9,10 @@ public interface ClienteRepository extends CrudRepository<Cliente, Long> {
 	//Optional<Cliente> findById(Long id);
 	Cliente findByTelefone(String telefone);
 	Cliente findById(Long id);
-	Cliente findBykjlOrderByLocalizacao(Long id);
+	//Cliente findBykjlOrderByLocalizacao(Long id);
 	
-	select POINT(-30,-10), localizacao, st_distance(POINT(-30,-11),localizacao) as dist
-	FROM jogos.cliente
-	order by dist
+	
+//	select POINT(-30,-10), localizacao, st_distance(POINT(-30,-11),localizacao) as dist
+//	FROM jogos.cliente
+//	order by dist
 }
