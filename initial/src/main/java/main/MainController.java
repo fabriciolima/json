@@ -1,5 +1,5 @@
 package main;
-import java.awt.Point;
+
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,11 +7,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.imageio.ImageIO;
 
 import org.json.simple.JSONObject;
@@ -31,14 +35,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateFilter;
-import com.vividsolutions.jts.geom.CoordinateSequenceComparator;
-import com.vividsolutions.jts.geom.CoordinateSequenceFilter;
-import com.vividsolutions.jts.geom.Envelope;
+import com.google.cloud.firestore.Firestore;
+import com.nimbusds.jose.EncryptionMethod;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.JWEHeader;
+import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.DirectEncrypter;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryComponentFilter;
-import com.vividsolutions.jts.geom.GeometryFilter;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
@@ -158,18 +162,23 @@ public class MainController {
 	
 	@GetMapping(path="/jogosperto")
 	@CrossOrigin(origins = "*", maxAge = 3600)
-	public @ResponseBody List<JogoPertoVO> getJogosPerto(){//@RequestParam String idCliente) {
+	public @ResponseBody List<JogoPertoVO> getJogosPerto(@RequestParam String pos, Pageable page) {
+//		String pos = "Point(0 0)";
+		String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
+		System.out.println(page);
+		System.out.println();
+		System.out.println(position);
 		List<JogoPertoVO> retorno = new ArrayList<JogoPertoVO>();
-		
-		WKTReader reader = new WKTReader();
-//		
 		try {
 			System.out.println("teste");
-			Geometry ponto= reader.read("Point(15 10)");
+			WKTReader reader = new WKTReader();
+			Geometry ponto= reader.read(position);
+		
+		
 			System.out.println(ponto);
 			List<Object[]> list = null;
 			if(ponto != null)
-				list = clienteRepositoryJPA.procuraJogosPerto(ponto);
+				list = clienteRepositoryJPA.procuraJogosPerto(ponto,page);
 			for(Object[] obj:list) {
 				String nomecliente = obj[0].toString();
 				String idcliente  = obj[1].toString();
@@ -181,6 +190,7 @@ public class MainController {
 				String dist  = obj[7].toString();
 				//System.out.println(obj[8]);
 				String estadojogo = obj[8]==null?"3":obj[8].toString();
+				String idJogoCliente = obj[9].toString();
 				
 				JogoPertoVO jp = new JogoPertoVO();
 				jp.setIdCliente(idcliente);
@@ -190,8 +200,9 @@ public class MainController {
 				jp.setNomeJogo(nomejogo);
 				jp.setNomePlataforma(nomeplataforma);
 				//Integer distancia = Integer.valueOf(dist);
-				jp.setDistancia(dist.concat(" KM"));				
+				jp.setDistancia(dist);				
 				jp.setEstadoDoJogo(estadojogo);
+				jp.setIdJogoCliente(idJogoCliente);
 				retorno.add(jp);
 			}
 		} catch (ParseException e) {
@@ -199,23 +210,6 @@ public class MainController {
 			System.out.println(e.getMessage());
 			return null;
 		}
-//		List<Cliente> procura = clienteRepositoryJPA.findByLocalizacao(reader.read("Point(-15 10)"));
-//		for (Cliente c:procura) {
-//			for(JogoCliente jc:c.getListaJogoCliente()) {
-//				JogoPertoVO jp = new JogoPertoVO();
-//				jp.setDistancia("0");
-//				jp.setEstadoDoJogo(jc.getEstadoDoJogo());
-//				jp.setIdCliente(jc.getCliente().getId());
-//				jp.setIdJogo(jc.getJogo().getId());
-//				jp.setIdPlataforma(jc.getPlataforma().getId());
-//				jp.setNomeCliente(c.getNome());
-//				jp.setNomeJogo(jc.getJogo().getNome());
-//				jp.setNomePlataforma(jc.getPlataforma().getNome());
-//				retorno.add(jp);
-//				
-//			}
-//		}
-		
 		return retorno;
 	}
 	
@@ -225,16 +219,22 @@ public class MainController {
 		//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
 		
 		for(Jogo j:listaJogo) 
-			if(j.getId() > 892)
 		{
-			//System.out.println(j.getId());
+			File fJPG = new File("images/"+String.valueOf(j.getId())+".JPG");
+			File fPNG = new File("images/"+String.valueOf(j.getId())+".PNG");
+			if(fPNG.exists() || fJPG.exists()) { 
+			    System.out.println(String.valueOf(j.getId()).concat(" - OK"));
+			}
+			else
 			try {
 		        
 				// can only grab first 100 results
 				//String userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36";
 				String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
 				String url = "https://www.google.com/search?site=imghp&tbm=isch&source=hp&gws_rd=cr&q=cover game ";
-				url = url.concat(j.getNome());
+				String filename = "A20/B22b#öA\\BC#Ä$%ld_ma.la.xps";
+				
+				url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", " "));
 
 				List<String> resultUrls = new ArrayList<String>();
 
@@ -245,15 +245,24 @@ public class MainController {
 
 				JSONObject jsonObject;
 				for (Element element : elements) {
-					if (element.childNodeSize() > 0) {
-						jsonObject = (JSONObject) new JSONParser().parse(element.childNode(0).toString());
-						resultUrls.add((String) jsonObject.get("ou"));
+					try {
+						if (element.childNodeSize() > 0) {
+							jsonObject = (JSONObject) new JSONParser().parse(element.childNode(0).toString());
+							resultUrls.add((String) jsonObject.get("ou"));
+						}
+					} catch (Exception e) {
+					
 					}
 				}
 
 				for (String imageUrl : resultUrls) 
 				{
 					try {
+						if(imageUrl.indexOf(".png") > 0)
+							imageUrl = imageUrl.substring(0,imageUrl.indexOf(".png")+4);
+						else
+							imageUrl = imageUrl.substring(0,imageUrl.indexOf(".jpg")+4);
+						System.out.println(imageUrl);
 //						String imageUrl = resultUrls.get(0);
 						String arq = imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length());
 						String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
@@ -262,10 +271,11 @@ public class MainController {
 						//System.out.println(imageUrl+" -> "+imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length()));
 						System.out.println(j.getId());
 						saveProxy(imageUrl, "images/"+String.valueOf(j.getId())+"."+arqExt );
+						System.out.println("ok");
 						break;
 					} catch (Exception e) {
 						System.out.println("erro: "+ imageUrl);
-						System.out.println(e.getMessage());
+						//System.out.println(e.getMessage());
 					}
 				}
 			}catch (Exception e) {
@@ -305,6 +315,105 @@ public static void saveImageByUrl(String urlString, String arq)throws Exception 
 		File toCreate = new File(arq);
 		String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
 		ImageIO.write(image, arqExt, toCreate);	
+}
+
+public @ResponseBody void inserejocoliente(@RequestParam String qtde) throws ParseException {
+	double minLat = -89.00;
+	double maxLat = 89.00;      
+	double minLon = -178.00;
+	double maxLon = 178.00;     
+	DecimalFormat df = new DecimalFormat("###.######");
+	WKTReader reader = new WKTReader();
+
+	Map<String, Object> docData = new HashMap<>();
+
+	Firestore db ;//= FirebaseFirestore .getInstance();
+	Iterable<JogoCliente> listaJC = jogoClienteRepository.findAll();
+	for(JogoCliente jc:listaJC) {
+		docData.put("estadojogo", jc.getEstadoDoJogo());
+		docData.put("idjogo", jc.getJogo().getId());
+		docData.put("idcliente", jc.getCliente().getId());
+		docData.put("idplataforma", jc.getPlataforma().getId());
+
+//		ApiFuture<WriteResult> future = db.collection("jogocliente").document(String.valueOf(jc.getId())).set(docData);
+//		// future.get() blocks on response
+//		System.out.println("Update time : " + future.get().getUpdateTime());
+	}
+	
+}
+
+
+public @ResponseBody void processa2(@RequestParam String qtde) throws ParseException {
+	double minLat = -89.00;
+	double maxLat = 89.00;      
+	double minLon = -178.00;
+	double maxLon = 178.00;     
+	DecimalFormat df = new DecimalFormat("###.######");
+	WKTReader reader = new WKTReader();
+
+	//Iterable<Cliente> listaCliente = clienteRepository.findAll();
+	//for(Cliente c:listaCliente) {
+	for(int cont =0 ; cont< Integer.parseInt(qtde); cont++) {
+		double longitude = minLon + (double)(Math.random() * ((maxLon - minLon) + 1));
+		double latitude = minLat + (double)(Math.random() * ((maxLat - minLat) + 1));
+		Geometry ponto= reader.read("Point(".concat(df.format(longitude)).concat(" ").concat(df.format(latitude).concat(")")).replaceAll(",", "."));
+		Cliente c = new Cliente();
+		c.setLocalizacao(ponto);
+		c.setNome(nomeRandom());
+		c.setTelefone(telRandom());
+		System.out.println(cont);
+		try {
+			clienteRepository.save(c);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+
+
+public String nomeRandom() {
+	final java.util.Random rand = new java.util.Random();
+	final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+    StringBuilder builder = new StringBuilder();
+    int length = rand.nextInt(5)+5;
+    for(int i = 0; i < length; i++) {
+        builder.append(lexicon.charAt(rand.nextInt(lexicon.length())));
+    }
+    return builder.toString();
+}
+
+public String telRandom() {
+	final java.util.Random rand = new java.util.Random();
+	final String lexicon = "12345674890";
+    StringBuilder builder = new StringBuilder();
+    int length = 10;
+    for(int i = 0; i < length; i++) {
+        builder.append(lexicon.charAt(rand.nextInt(lexicon.length())));
+    }
+    return builder.toString();
+}
+
+public String getEncrypt(String dado) throws Exception {
+	KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+	keyGen.init(128);
+	SecretKey key = keyGen.generateKey();
+
+	// Create the header
+	JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM);
+
+	// Set the plain text
+	Payload payload = new Payload(dado);
+
+	// Create the JWE object and encrypt it
+	JWEObject jweObject = new JWEObject(header, payload);
+	jweObject.encrypt(new DirectEncrypter(key));
+
+	// Serialise to compact JOSE form...
+	String jweString = jweObject.serialize();
+
+	return jweString;
+	
 }
 
 }

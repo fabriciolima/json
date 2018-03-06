@@ -10,6 +10,9 @@ public class JogoPertoVO {
 	private String idPlataforma;
 	private String nomePlataforma;
 	private String distancia;
+	private String idJogoCliente;
+	
+	
 	public String getEstadoDoJogo() {
 		return estadoDoJogo;
 	}
@@ -57,6 +60,12 @@ public class JogoPertoVO {
 	}
 	public void setDistancia(String distancia) {
 		this.distancia = distancia;
+	}
+	public String getIdJogoCliente() {
+		return idJogoCliente;
+	}
+	public void setIdJogoCliente(String jogoCliente) {
+		this.idJogoCliente = jogoCliente;
 	}
 	
 
