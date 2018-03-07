@@ -213,7 +213,7 @@ public class MainController {
 		return retorno;
 	}
 	
-	@GetMapping(path="/p")
+	//@GetMapping(path="/p")
 	public @ResponseBody String processa() {
 		Iterable<Jogo> listaJogo = jogoRepository.findAll();
 		//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
