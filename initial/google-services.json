@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "1082277080885",
+    "firebase_url": "https://jogos-usados.firebaseio.com",
+    "project_id": "jogos-usados",
+    "storage_bucket": "jogos-usados.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082277080885:android:1af2f3e366b0268d",
+        "android_client_info": {
+          "package_name": "com.trocajogo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1082277080885-dpn85j4d3v6pemm8vdeag6cp934boj22.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBM9veJ4O_o4N6PQHV6D6OB8WmwRC9TijI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082277080885:android:6ed466e8e597fb06",
+        "android_client_info": {
+          "package_name": "com.trocajogo.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1082277080885-dpn85j4d3v6pemm8vdeag6cp934boj22.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBM9veJ4O_o4N6PQHV6D6OB8WmwRC9TijI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

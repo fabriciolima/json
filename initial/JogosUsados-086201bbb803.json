@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "jogos-usados",
+  "private_key_id": "086201bbb803402c4e37d10f39ac9a4044165874",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCVnW+BSFkpnyXF\nbBSLd+1wSGBUs9un1suKpbSEAnCIUCXmf8BhTTzSvvbVn+ukk+eKZHyzekbPOzhy\nNwRhjCULbqOLZ+7KvzJJfoW5efEeS+TtSfU1LKWCTQjOqSxNHq7B+p3EZT76Mqqz\npuva0MZM+9SEGVkHVLeftX36FxhdjkCJaKHTIxxfaz6AMBrLQBMD3tBFXEOqO1YE\ngAg249YnwylC28UUvc6DIBrYji8PBgEvbxL9mN418YEmux2DxtMXDZ8PNngWs3no\nEfal6jRnAEIBO08QZvXoVfdwWzUjzD+DLwMwradXHlJS9nFAjnp04GhN+Xh6JFO+\nQ9RGrtT9AgMBAAECggEAOE300iL/hxXg+ZCIlMoPvbNHKWk8b0f69pUQv6NJZUtA\nUCPgqt2N18PNEazq2dddiivx7/tC3acsQXNp/ynmIQzEmGiHKZ7Vlmn6ekglUSD/\nqLsuABJqwQQrndZ1mRpEazTdHbV6g18A9bYKSaFLF1qoagQ+CG+94OlE3RLG9SHJ\n2yK11zd3Uy4D+02lp5ajdQ02kBQMHcMAB9DZO53qBNah2pFu8ABmukrXK4/Iikxr\n5granG6UUa4WYp3D/8og8b+6X8yFkFEb75YE7riLhRZz9WhBwEWFSON13kks682n\nh8m0tZH6GhgUKkRp+xpf+WGi3NQUOd457FcM/xa9YwKBgQDHygDxKuUhCksZyjr5\n26ZrdVQlqcgGjjvEg0aCuNtE8K6/kpEykh3TblxOmGRqkUvjt8caoykJuuGGpXeE\nlwTLXeZAln5TifcTmU4nGGIdqdHYGb2JbHtgVHi+7qZYMAQzZrIAihSVprHOqj+A\nwn5gNwzAZO0KBnE+ETztdRFg3wKBgQC/tZh0RiPppjAEenxTJ92W2UNwjmFPAtuB\nmDeN0oh9lvXzm2IyS9OwrBG1VqQSFB/Nlzkw6h8Gyy3fFbaOgMbGxgMwc+zKQ3Vl\nBMC4/CCtrz8v03dy+y9SWrX+PiemcYU9cld2NzIcZ8zkdOX0+e5A40CVT23wGavv\namO1VQO5owKBgQCaEVoWoLifeRufIMfIJK26knk4riw1efv3ODDo3/sft+dajoFw\nGSPtB18hsP1G/RMj4XYmQYqFGVuPhQyc8ATfe2LzjdqPO4aQ05lkJraLH4lWd8sl\nLcYa7ClNPCaFPUoQBXLhXZowKaNWtw1Pkyz3r5wixfHR2FP9xDdS+wNSywKBgB07\nSmDIZSd2YLH+H0Dqvj4HKOJbw3ixvdi35hio9oj34M7hbYqvxzqUMisNZ/0dtm+5\n1E2iFVMK3ha7D9gQyL58aPYVZxC8UoUxwVUzlKQHKcJYI0mUBXYwQLngrlkRzDg/\nXBi5d9me9j4LmRjOl0aroChkMSZAM9hQx51ZtjSzAoGBAI5ZhjkiZsqY+m9/uhVo\n9TClxaJrxRIgcCQXnT7i2icaDwx1haqpsYfwqASzgMzSWtQkiS8uWAAuL87QIIL2\noYTdQGYErfeFD02kZUqkfeM4PH338zquT/ho53rWL6bpCNJN8WiI/MTCvgvGC7+L\nyGN4tSBaMecQOMUof/HKX1ma\n-----END PRIVATE KEY-----\n",
+  "client_email": "jogos-usados@appspot.gserviceaccount.com",
+  "client_id": "102106631624100123231",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/jogos-usados%40appspot.gserviceaccount.com"
+}
