@@ -21,11 +21,11 @@ public class JogoCliente {
 	private String uidCliente;
 	private String uidJogo;
 	private Integer estadoDoJogo;
-//	@ManyToOne
+	@ManyToOne
 	private Cliente cliente;
-//	@ManyToOne
+	@ManyToOne
 	private Jogo jogo;
-//	@ManyToOne
+	@ManyToOne
 	private Plataforma plataforma;
 	private Date dataModificado;
 	private Date dataCadastro;
