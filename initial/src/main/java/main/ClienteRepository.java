@@ -7,7 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface ClienteRepository extends CrudRepository<Cliente, Long> {
 	//Optional<Cliente> findById(Long id);
-	Cliente findByTelefone(String telefone);
+	Cliente findByUid(String uid);
 	Cliente findById(Long id);
 	//Cliente findBykjlOrderByLocalizacao(Long id);
 	

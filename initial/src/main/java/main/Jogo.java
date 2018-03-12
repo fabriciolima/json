@@ -1,13 +1,12 @@
 package main;
 
 import java.util.Date;
-import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 @Entity
 public class Jogo {
@@ -15,7 +14,10 @@ public class Jogo {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	@Column(unique=true)
+	private String uid;
 	private String nome;
+	private String nomePesquisa;
 	private Date dataModificado;
 	private Boolean apagado;
 	private Boolean aprovado;
@@ -24,10 +26,10 @@ public class Jogo {
 //	@OneToMany(mappedBy="jogo")
 //	private List<JogoCliente> listaJogoCliente;
 	
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public String getNome() {
@@ -61,6 +63,18 @@ public class Jogo {
 	}
 	public void setRevisao(Integer revisao) {
 		this.revisao = revisao;
+	}
+	public String getNomePesquisa() {
+		return nomePesquisa;
+	}
+	public void setNomePesquisa(String nomePesquisa) {
+		this.nomePesquisa = nomePesquisa;
+	}
+	public String getUid() {
+		return uid;
+	}
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 	
 	

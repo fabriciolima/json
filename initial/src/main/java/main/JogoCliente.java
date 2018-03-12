@@ -2,6 +2,7 @@ package main;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +16,10 @@ public class JogoCliente {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	@Column(unique=true)
+	private String uid;
+	private String uidCliente;
+	private String uidJogo;
 	private Integer estadoDoJogo;
 	@ManyToOne
 	private Cliente cliente;
@@ -24,16 +29,15 @@ public class JogoCliente {
 	private Plataforma plataforma;
 	private Date dataModificado;
 	private Date dataCadastro;
+	private Date dataApagado;
+	private Date dataUltimaAbertura;
 	//@Column(columnDefinition="default 0")
 	private Boolean apagado=false;
 	//@Column(columnDefinition="default 0")
 	private Boolean aprovado=false;
 	
-	public long getId() {
+	public Long getId() {
 		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
 	}
 	
 	public Boolean getApagado() {
@@ -89,5 +93,41 @@ public class JogoCliente {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+	public String getUid() {
+		return uid;
+	}
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+	public Date getDataApagado() {
+		return dataApagado;
+	}
+	public void setDataApagado(Date dataApagado) {
+		this.dataApagado = dataApagado;
+	}
+
+	public Date getDataUltimaAbertura() {
+		return dataUltimaAbertura;
+	}
+
+	public void setDataUltimaAbertura(Date dataUltimaAbertura) {
+		this.dataUltimaAbertura = dataUltimaAbertura;
+	}
+
+	public String getUidJogo() {
+		return uidJogo;
+	}
+
+	public void setUidJogo(String uidJogo) {
+		this.uidJogo = uidJogo;
+	}
+
+	public String getUidCliente() {
+		return uidCliente;
+	}
+
+	public void setUidCliente(String uidCliente) {
+		this.uidCliente = uidCliente;
+	}
+
 }

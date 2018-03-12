@@ -20,11 +20,11 @@ public interface ClienteRepositoryJPA extends JpaRepository<Cliente, Long> {
     List<Cliente> findByLocalizacao(Geometry localizacao);
 	
 	//@Query(value = "SELECT c.id, localizacao, st_distance(POINT(-30,-11),localizacao) as dist  FROM cliente c order by st_distance(?1,localizacao)", nativeQuery = true)
-	@Query(value = "SELECT c.nome nomecliente, c.id idcliente, localizacao, j.id as idjogo, j.nome as nomejogo, p.id idplataforma, p.nome nomeplataforma,"
-			+"	TRUNCATE(st_distance_sphere(?,localizacao)/1000,0) as dist, jc.estado_do_jogo estadojogo,jc.id idjogocliente " 
+	@Query(value = "SELECT c.nome nomecliente, c.uid uidcliente, localizacao, j.uid as uidjogo, j.nome as nomejogo, p.id idplataforma, p.nome nomeplataforma,"
+			+" TRUNCATE(st_distance_sphere(?,localizacao)/1000,0) as dist, jc.estado_do_jogo estadojogo,jc.uid idjogocliente " 
 			+"FROM cliente c, jogo j, plataforma p ,jogo_cliente jc "
-			+"WHERE c.id = jc.cliente_id "
-			+"and j.id = jc.jogo_id "
+			+"WHERE c.uid = jc.uid_Cliente "
+			+"and j.uid = jc.uid_Jogo "
 			+"and p.id = jc.plataforma_id "
 			+"order by dist \n#pageable\n ", 
 			countQuery = "SELECT count(*) from cliente\n",

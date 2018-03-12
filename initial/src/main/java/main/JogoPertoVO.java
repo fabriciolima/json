@@ -68,6 +68,5 @@ public class JogoPertoVO {
 		this.idJogoCliente = jogoCliente;
 	}
 	
-
-	
 }
+

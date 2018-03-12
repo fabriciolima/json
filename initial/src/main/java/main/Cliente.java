@@ -1,5 +1,6 @@
 package main;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -23,6 +24,9 @@ public class Cliente {
 	private String nome;
 	@Column(unique=true)
 	private String telefone;
+	private Date dataDescadastro;
+	@Column(unique=true)
+	private String uid;
 	@Column(columnDefinition="Geometry")
 	//@Type(type="org.hibernate.spatial.GeometryType")
 	private Geometry localizacao;
@@ -103,5 +107,21 @@ public class Cliente {
 
 	public void setListaJogoCliente(List<JogoCliente> listaJogoCliente) {
 		this.listaJogoCliente = listaJogoCliente;
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
+	public Date getDataDescadastro() {
+		return dataDescadastro;
+	}
+
+	public void setDataDescadastro(Date dataDescadastro) {
+		this.dataDescadastro = dataDescadastro;
 	}	
 }

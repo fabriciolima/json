@@ -6,6 +6,9 @@ import org.springframework.data.repository.CrudRepository;
 // CRUD refers Create, Read, Update, Delete
 
 public interface JogoClienteRepository extends CrudRepository<JogoCliente, Long> {
+	
+	
+	
 	//List<Jogo> findByDataModificadoGreaterThanEqual(Date data);
 	//List<Jogo> findAllByDataModificadoGreaterThanEqual(Date data);
 //	@Query("SELECT jc FROM JogoCliente jc WHERE LOWER(p.lastName) = LOWER(:localizacao)")
