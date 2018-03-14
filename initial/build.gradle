@@ -6,7 +6,7 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.10.RELEASE")
     }
 }
-
+apply plugin: 'war'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -26,6 +26,9 @@ targetCompatibility = 1.8
 
 dependencies {
 // https://mvnrepository.com/artifact/com.google.api/gax
+
+	//providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-web'
 
     compile("org.springframework.boot:spring-boot-starter-web")
     // https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt
