@@ -2,7 +2,6 @@ package main;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,7 +30,24 @@ public interface ClienteRepositoryJPA extends JpaRepository<Cliente, Long> {
 			nativeQuery = true)	
     List<Object[]> procuraJogosPerto(Geometry localizacao, Pageable pageable);
 
-	//	select POINT(-30,-10), localizacao, st_distance(POINT(-30,-11),localizacao) as dist
-//	FROM jogos.cliente
-//	order by dist
+//    Set<Integer> ids = ...;
+//
+//    MapSqlParameterSource parameters = new MapSqlParameterSource();
+//    parameters.addValue("ids", ids);
+//
+//    List<Foo> foo = getJdbcTemplate().query("SELECT * FROM foo WHERE a IN (:ids)",
+//         parameters, getRowMapper());
+//    This only works if getJdbcTemplate() returns an instance of type NamedParameterJdbcTemplate
+    
+    
+//    String sql = "SELECT bg.goodsid FROM beiker_goods bg WHERE bg.goodsid IN (:goodsid)";
+//    List ids = Arrays.asList(new Integer[]{12496,12497,12498,12499});
+//    Map<String, List> paramMap = Collections.singletonMap("goodsid", ids);
+//    NamedParameterJdbcTemplate template = 
+//        new NamedParameterJdbcTemplate(getJdbcTemplate().getDataSource());
+//    List<Long> list = template.queryForList(sql, paramMap, Long.class);
+
+
+
+
 }
