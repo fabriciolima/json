@@ -1,11 +1,10 @@
-package negocio;
+package main.negocio;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.api.core.ApiFuture;
@@ -15,8 +14,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 
 import main.FireBaseDB;
-import main.Jogo;
 import main.JogoRepository;
+import main.entidade.Jogo;
 
 @Service
 public class JogoNegocio {

@@ -12,6 +12,8 @@ import javax.persistence.criteria.Root;
 
 import org.hibernate.Criteria;
 
+import main.entidade.Jogo;
+
 public abstract class JogoDAO implements JogoRepository{
 	@PersistenceContext
 	private static EntityManager entityManager;

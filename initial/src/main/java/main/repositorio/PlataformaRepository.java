@@ -1,9 +1,11 @@
-package main;
+package main.repositorio;
 
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
+
+import main.entidade.Plataforma;
 
 // This will be AUTO IMPLEMENTED by Spring into a Bean called userRepository
 // CRUD refers Create, Read, Update, Delete

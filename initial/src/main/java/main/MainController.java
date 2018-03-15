@@ -9,12 +9,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Resource;
 import javax.crypto.KeyGenerator;
@@ -40,14 +38,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.GeoPoint;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWEHeader;
@@ -58,7 +51,19 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
-import negocio.JogoNegocio;
+import main.entidade.Cliente;
+import main.entidade.Jogo;
+import main.entidade.JogoCliente;
+import main.entidade.JogoClienteVO;
+import main.entidade.JogoPertoVO;
+import main.entidade.Plataforma;
+import main.entidade.Troca;
+import main.negocio.JogoNegocio;
+import main.repositorio.ClienteRepository;
+import main.repositorio.ClienteRepositoryJPA;
+import main.repositorio.JogoClienteRepository;
+import main.repositorio.PlataformaRepository;
+import main.repositorio.TrocaRepository;
 
 @Controller// This means that this class is a Controller
 @RequestMapping(path="/json") // This means URL's start with /demo (after Application path)
@@ -88,15 +93,26 @@ public class MainController {
 			, @RequestParam String estado
 			, @RequestParam String nomePesquisa
 			, @RequestParam String nomeJogo
-			, @RequestParam String dinheiro ) throws Exception
+			, @RequestParam String dinheiro )
 	{
 
 		if(db==null) {
 			FireBaseDB fire = new FireBaseDB();
-			db = fire.getDb();
+			try {
+				db = fire.getDb();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		JogoNegocio jogoNegocio = new JogoNegocio();
-		Jogo jogo = jogoNegocio.getJogo(db, jogoRepository, nomeJogo, nomePesquisa);
+		Jogo jogo=null;;
+		try {
+			jogo = jogoNegocio.getJogo(db, jogoRepository, nomeJogo, nomePesquisa);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Plataforma plataforma = plataformaRepository.findById(Long.decode(idPlataforma));
 		
 		
@@ -310,7 +326,7 @@ public class MainController {
 
 						//System.out.println(imageUrl+" -> "+imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length()));
 						System.out.println(j.getId());
-						saveProxy(imageUrl, "images/"+String.valueOf(j.getId())+"."+arqExt );
+						//saveProxy(imageUrl, "images/"+String.valueOf(j.getId())+"."+arqExt );
 						System.out.println("ok");
 						break;
 					} catch (Exception e) {
@@ -326,38 +342,38 @@ public class MainController {
 
 	}
 	
-	public static void saveProxy(String imageUrl, String arq) throws Exception {
-		String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";	
-		URL url = new URL(imageUrl);
-		HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-	    httpcon.addRequestProperty("User-Agent", userAgent);
+//	public static void saveProxy(String imageUrl, String arq) {
+//		String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";	
+//		URL url = new URL(imageUrl);
+//		HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+//	    httpcon.addRequestProperty("User-Agent", userAgent);
+//
+//	    BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
+//
+//
+//			// Open a connection to the URL using the proxy information.
+//			InputStream inStream = httpcon.getInputStream();
+//
+//			// BufferedImage image = ImageIO.read(url);
+//			// Use the InputStream flavor of ImageIO.read() instead.
+//			BufferedImage image = ImageIO.read(inStream);
+//
+//			String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
+//			ImageIO.write(image, arqExt, new File(arq));
+//
+//	}
+//
+//public static void saveImageByUrl(String urlString, String arq)throws Exception {
+//		
+//	BufferedImage image = null;
+//		URL url = new URL(urlString);
+//		image = ImageIO.read(url);
+//		File toCreate = new File(arq);
+//		String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
+//		ImageIO.write(image, arqExt, toCreate);	
+//}
 
-	    BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
-
-
-			// Open a connection to the URL using the proxy information.
-			InputStream inStream = httpcon.getInputStream();
-
-			// BufferedImage image = ImageIO.read(url);
-			// Use the InputStream flavor of ImageIO.read() instead.
-			BufferedImage image = ImageIO.read(inStream);
-
-			String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
-			ImageIO.write(image, arqExt, new File(arq));
-
-	}
-
-public static void saveImageByUrl(String urlString, String arq)throws Exception {
-		
-	BufferedImage image = null;
-		URL url = new URL(urlString);
-		image = ImageIO.read(url);
-		File toCreate = new File(arq);
-		String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
-		ImageIO.write(image, arqExt, toCreate);	
-}
-
-public @ResponseBody void inserejogoliente(@RequestParam String qtde) throws ParseException {
+public @ResponseBody void inserejogoliente(@RequestParam String qtde) {
 	double minLat = -89.00;
 	double maxLat = 89.00;      
 	double minLon = -178.00;
@@ -383,33 +399,33 @@ public @ResponseBody void inserejogoliente(@RequestParam String qtde) throws Par
 }
 
 
-public @ResponseBody void processa2(@RequestParam String qtde) throws ParseException {
-	double minLat = -89.00;
-	double maxLat = 89.00;      
-	double minLon = -178.00;
-	double maxLon = 178.00;     
-	DecimalFormat df = new DecimalFormat("###.######");
-	WKTReader reader = new WKTReader();
-
-	//Iterable<Cliente> listaCliente = clienteRepository.findAll();
-	//for(Cliente c:listaCliente) {
-	for(int cont =0 ; cont< Integer.parseInt(qtde); cont++) {
-		double longitude = minLon + (double)(Math.random() * ((maxLon - minLon) + 1));
-		double latitude = minLat + (double)(Math.random() * ((maxLat - minLat) + 1));
-		Geometry ponto= reader.read("Point(".concat(df.format(longitude)).concat(" ").concat(df.format(latitude).concat(")")).replaceAll(",", "."));
-		Cliente c = new Cliente();
-		c.setLocalizacao(ponto);
-		c.setNome(nomeRandom());
-		c.setTelefone(telRandom());
-		System.out.println(cont);
-		try {
-			clienteRepository.save(c);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-}
+//public @ResponseBody void processa2(@RequestParam String qtde) throws ParseException {
+//	double minLat = -89.00;
+//	double maxLat = 89.00;      
+//	double minLon = -178.00;
+//	double maxLon = 178.00;     
+//	DecimalFormat df = new DecimalFormat("###.######");
+//	WKTReader reader = new WKTReader();
+//
+//	//Iterable<Cliente> listaCliente = clienteRepository.findAll();
+//	//for(Cliente c:listaCliente) {
+//	for(int cont =0 ; cont< Integer.parseInt(qtde); cont++) {
+//		double longitude = minLon + (double)(Math.random() * ((maxLon - minLon) + 1));
+//		double latitude = minLat + (double)(Math.random() * ((maxLat - minLat) + 1));
+//		Geometry ponto= reader.read("Point(".concat(df.format(longitude)).concat(" ").concat(df.format(latitude).concat(")")).replaceAll(",", "."));
+//		Cliente c = new Cliente();
+//		c.setLocalizacao(ponto);
+//		c.setNome(nomeRandom());
+//		c.setTelefone(telRandom());
+//		System.out.println(cont);
+//		try {
+//			clienteRepository.save(c);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+//}
 
 
 public String nomeRandom() {
@@ -457,7 +473,7 @@ public String getEncrypt(String dado) throws Exception {
 }
 
 @GetMapping(path="/teste")
-public @ResponseBody String testes() throws Exception {
+public @ResponseBody String testes() {
 
 	return "server ok";
 }
@@ -467,12 +483,16 @@ public @ResponseBody String testes() throws Exception {
 @Transactional
 public @ResponseBody String adicionaJogoTroca(
 		@RequestParam String idJogoCliente,
-		@RequestParam ArrayList<String> jogosTroca) throws Exception
+		@RequestParam ArrayList<String> jogosTroca)
 {
 
 	if(db==null) {
 		FireBaseDB fire = new FireBaseDB();
-		db = fire.getDb();
+		try {
+			db = fire.getDb();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	System.out.println(jogosTroca);
 	//salva no firebase
