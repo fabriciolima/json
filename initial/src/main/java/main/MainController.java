@@ -74,6 +74,7 @@ public class MainController {
 	@Autowired private JogoRepository jogoRepository;
 	@Autowired private JogoClienteRepository jogoClienteRepository;
 	@Autowired private ClienteRepository clienteRepository;
+	@Autowired private TrocaRepository trocaRepository;
 	@Resource private ClienteRepositoryJPA clienteRepositoryJPA;
 	@Autowired private PlataformaRepository plataformaRepository;
 
@@ -83,7 +84,7 @@ public class MainController {
 	@Transactional
 	public @ResponseBody String adicionaJogoCliente (
 			@RequestParam String idPlataforma
-			, @RequestParam String uidCliente
+			, @RequestParam String idCliente
 			, @RequestParam String estado
 			, @RequestParam String nomePesquisa
 			, @RequestParam String nomeJogo
@@ -96,45 +97,39 @@ public class MainController {
 		}
 		JogoNegocio jogoNegocio = new JogoNegocio();
 		Jogo jogo = jogoNegocio.getJogo(db, jogoRepository, nomeJogo, nomePesquisa);
-		Plataforma plataforma = plataformaRepository.findOne(Long.decode(idPlataforma));
+		Plataforma plataforma = plataformaRepository.findById(Long.decode(idPlataforma));
 		
 		
 		//salva no firebase
-		Map<String, Object> jogoCliente = new HashMap<>();
-		jogoCliente.put("idplataforma", idPlataforma);
-		jogoCliente.put("idjogo", jogo.getUid());
-		jogoCliente.put("idcliente",uidCliente);
-		jogoCliente.put("estado", estado);
-		jogoCliente.put("nomepesquisa",nomePesquisa );
-		jogoCliente.put("nomejogo", nomeJogo);
-		jogoCliente.put("dinheiro",dinheiro);
-		jogoCliente.put("ultimaabertura", new Date());
-		jogoCliente.put("dataApagado","");
-		
-		ApiFuture<DocumentReference> jogoClienteRef = db.collection("jogocliente").add(jogoCliente);
+//		Map<String, Object> jogoCliente = new HashMap<>();
+//		jogoCliente.put("idplataforma", idPlataforma);
+//		jogoCliente.put("idjogo", jogo.getUid());
+//		jogoCliente.put("idcliente",idCliente);
+//		jogoCliente.put("estado", estado);
+//		jogoCliente.put("nomepesquisa",nomePesquisa );
+//		jogoCliente.put("nomejogo", nomeJogo);
+//		jogoCliente.put("dinheiro",dinheiro);
+//		jogoCliente.put("ultimaabertura", new Date());
+//		jogoCliente.put("dataApagado","");
+//		
+//		ApiFuture<DocumentReference> jogoClienteRef = db.collection("jogocliente").add(jogoCliente);
 		
 		//salva no mysql
 		JogoCliente jogoClienteSQL = new JogoCliente();
-		Cliente cliente = buscaCliente(uidCliente);
-		jogoClienteSQL.setUid(jogoClienteRef.get().getId());
+		Cliente cliente = clienteRepository.findById(Long.decode(idCliente));
+		
 		jogoClienteSQL.setCliente(cliente);
-		jogoClienteSQL.setUidCliente(uidCliente);
-		jogoClienteSQL.setUidJogo(jogo.getUid());
 		jogoClienteSQL.setJogo(jogo);
 		jogoClienteSQL.setPlataforma(plataforma);
 		jogoClienteSQL.setDataCadastro(new Date());
 		jogoClienteSQL.setDataUltimaAbertura(new Date());
 		jogoClienteSQL.setEstadoDoJogo(Integer.valueOf(estado));
 		jogoClienteRepository.save(jogoClienteSQL);
-		System.out.println("Novo JogoCliente: ".concat(jogoClienteSQL.getUid()));
-		return jogoClienteSQL.getUid();
+		System.out.println("Novo JogoCliente: ".concat(jogoClienteSQL.getId().toString()));
+		return jogoClienteSQL.getId().toString();
 	}
 
-	private Cliente buscaCliente(String uid) {
-		Cliente cliente = clienteRepository.findByUid(uid);
-		return cliente;
-	}
-
+	
 	@PostMapping(path="/cliente/add") // Map ONLY GET Requests
 	@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
 	public @ResponseBody String adicionaCliente(
@@ -163,14 +158,14 @@ public class MainController {
 				cliente.put("nome",nome);
 				cliente.put("localizacao", localizacao);
 				ApiFuture<DocumentReference> clienteRef = db.collection("cliente").add(cliente);
-				System.out.println("novo Cliente ID: " + clienteRef.get().getId());
 				
 				
 				c.setNome(nome);
 				c.setUid(clienteRef.get().getId());
 				c.setLocalizacao(ponto);
 				clienteRepository.save(c);
-				retorno = clienteRef.get().getId();
+				retorno = c.getId().toString();
+				System.out.println("novo Cliente ID: " + retorno);
 			}
 			
 		} catch (Exception e) {
@@ -204,15 +199,6 @@ public class MainController {
 		return retorno;
 	}
 	
-	@GetMapping(path="/meusjogos")
-	@CrossOrigin(origins = "*", maxAge = 3600)
-	public @ResponseBody List<JogoCliente> getmeusJogo(@RequestParam String idCliente) {
-		List<JogoCliente> retorno = (List<JogoCliente>) jogoClienteRepository.findAll();
-		System.out.println(retorno.size());
-		//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
-		
-		return retorno;
-	}
 	
 	@GetMapping(path="/jogosperto")
 	@CrossOrigin(origins = "*", maxAge = 3600)
@@ -473,26 +459,7 @@ public String getEncrypt(String dado) throws Exception {
 @GetMapping(path="/teste")
 public @ResponseBody String testes() throws Exception {
 
-	if(db==null) {
-		System.out.println("Instanciando FireDB");
-		FireBaseDB fire = new FireBaseDB();
-		db = fire.getDb();
-	}
-
-	try {
-		DocumentReference docRef = db.collection("cliente").document("alguem");
-		ApiFuture<DocumentSnapshot> future = docRef.get();
-		DocumentSnapshot document;
-		document = future.get();
-	if (document.exists()) {
-		System.out.println("Document data: " + document.getData());
-	} else {
-		System.out.println("No such document!");
-	}
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-	return "document.getData().getNome()";
+	return "server ok";
 }
 
 @PostMapping(path="/jogo/troca/add") // Map ONLY GET Requests
@@ -523,6 +490,95 @@ public @ResponseBody String adicionaJogoTroca(
 	return null;
 	
 }
+
+@PostMapping(path="/fazproposta") // Map ONLY GET Requests
+@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+public @ResponseBody String fazProposta(
+		@RequestParam String funcao, 
+		@RequestParam Long idinteresse, 
+		@RequestParam Long idproposta) {
 	
+	String retorno = "error";
+	JogoCliente jcInteresse = jogoClienteRepository.findById(idinteresse);
+	JogoCliente jcProposta = jogoClienteRepository.findById(idproposta);
+	if(jcInteresse!= null && jcProposta != null) {
+		List<Troca> byInteresseAndProposta = trocaRepository.findByInteresseAndProposta(jcInteresse, jcProposta);
+		if(byInteresseAndProposta.size() > 0 && funcao.equals("remove")) {
+			trocaRepository.delete(byInteresseAndProposta.get(0));
+			retorno = "del";
+		}else {
+			if(byInteresseAndProposta.size() == 0 && funcao.equals("adiciona")) {
+				Troca troca = new Troca();
+				troca.setDataCadastro(new Date());
+				troca.setInteresse(jcInteresse);
+				troca.setProposta(jcProposta);
+				trocaRepository.save(troca);
+				retorno = "add";
+			} 
+		}
+	}
+	return retorno;
+}
+
+
+@GetMapping(path="/meusjogos")
+@CrossOrigin(origins = "*", maxAge = 3600)
+public @ResponseBody List<JogoClienteVO> getmeusJogo(
+		@RequestParam String idcliente,
+		@RequestParam String idinteresse) {
+	Cliente cliente = clienteRepository.findById(Long.parseLong(idcliente));
+	List<JogoCliente> jogoCliente = jogoClienteRepository.findByCliente(cliente);
+
+	List<JogoClienteVO> retorno = new ArrayList<JogoClienteVO>();
+	if(jogoCliente.size()>0) {
+		for(JogoCliente jc:jogoCliente)
+		{
+			JogoClienteVO jogoClienteVO =new JogoClienteVO();
+			jogoClienteVO.setId(jc.getId());
+			jogoClienteVO.setIdJogo(jc.getJogo().getId().toString());
+			jogoClienteVO.setNomeJogo(jc.getJogo().getNome());
+			jogoClienteVO.setIdPlataforma(jc.getPlataforma().getId().toString());
+			jogoClienteVO.setNomePlataforma(jc.getPlataforma().getNome());
+			List<Troca> byInteresse = trocaRepository.findByInteresse(jc);
+			jogoClienteVO.setQtdInteressados(String.valueOf(byInteresse.size()));
+			
+			if(idinteresse != null) {//usado na tela de propostas
+				JogoCliente jcInteresse = jogoClienteRepository.findById(Long.parseLong(idinteresse));
+//				List<Troca> listaInteressado = trocaRepository.findByInteressado(jcInteresse);
+				List<Troca> listaInteresseInteressado = trocaRepository.findByInteresseAndProposta(jcInteresse, jc);
+				if(listaInteresseInteressado.size() > 0) {
+					jogoClienteVO.setPossuiPropostaCom(idinteresse);
+					//jogoClienteVO.set
+				}
+				
+			retorno.add(jogoClienteVO);
+			}
+		}
+	}
+	//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
+	
+	return retorno;
+}
+
+@GetMapping(path="/jogocliente")
+@CrossOrigin(origins = "*", maxAge = 3600)
+public @ResponseBody JogoClienteVO getJogoCliente(
+		@RequestParam String idjogocliente) {
+	JogoCliente jc = jogoClienteRepository.findById(Long.parseLong(idjogocliente));
+
+	JogoClienteVO jogoClienteVO = new JogoClienteVO();
+	if(jc != null) {
+			jogoClienteVO.setId(jc.getId());
+			jogoClienteVO.setIdJogo(jc.getJogo().getId().toString());
+			jogoClienteVO.setNomeJogo(jc.getJogo().getNome());
+			jogoClienteVO.setIdPlataforma(jc.getPlataforma().getId().toString());
+			jogoClienteVO.setNomePlataforma(jc.getPlataforma().getNome());
+			List<Troca> byInteresse = trocaRepository.findByInteresse(jc);
+			jogoClienteVO.setQtdInteressados(String.valueOf(byInteresse.size()));
+		}
+	
+	return jogoClienteVO;
+}
+
 
 }

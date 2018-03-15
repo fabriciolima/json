@@ -11,4 +11,6 @@ import org.springframework.data.repository.CrudRepository;
 public interface PlataformaRepository extends CrudRepository<Plataforma, Long> {
 	List<Plataforma> findByDataModificadoGreaterThanEqual(Date data);
 	//List<Plataforma> findAllByDataModificadoGreaterThanEqual(Date data);
+
+	Plataforma findById(Long decode);
 }

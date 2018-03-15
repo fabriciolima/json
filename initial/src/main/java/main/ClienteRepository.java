@@ -12,6 +12,7 @@ public interface ClienteRepository extends CrudRepository<Cliente, Long> {
 	//Cliente findBykjlOrderByLocalizacao(Long id);
 	
 	
+	
 //	select POINT(-30,-10), localizacao, st_distance(POINT(-30,-11),localizacao) as dist
 //	FROM jogos.cliente
 //	order by dist

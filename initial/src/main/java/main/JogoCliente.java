@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class JogoCliente {
@@ -16,16 +17,12 @@ public class JogoCliente {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	@Column(unique=true)
-	private String uid;
-	private String uidCliente;
-	private String uidJogo;
 	private Integer estadoDoJogo;
-	@ManyToOne
+	@ManyToOne @NotNull
 	private Cliente cliente;
-	@ManyToOne
+	@ManyToOne @NotNull
 	private Jogo jogo;
-	@ManyToOne
+	@ManyToOne @NotNull 
 	private Plataforma plataforma;
 	private Date dataModificado;
 	private Date dataCadastro;
@@ -93,12 +90,6 @@ public class JogoCliente {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getUid() {
-		return uid;
-	}
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
 	public Date getDataApagado() {
 		return dataApagado;
 	}
@@ -114,20 +105,5 @@ public class JogoCliente {
 		this.dataUltimaAbertura = dataUltimaAbertura;
 	}
 
-	public String getUidJogo() {
-		return uidJogo;
-	}
-
-	public void setUidJogo(String uidJogo) {
-		this.uidJogo = uidJogo;
-	}
-
-	public String getUidCliente() {
-		return uidCliente;
-	}
-
-	public void setUidCliente(String uidCliente) {
-		this.uidCliente = uidCliente;
-	}
 
 }
