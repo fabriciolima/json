@@ -2,6 +2,8 @@ package main.entidade;
 
 public class JogoClienteVO {
 	
+	
+	private String distancia;
 	private Long id;
 	private String uid;
 	private String uidCliente;
@@ -86,5 +88,11 @@ public class JogoClienteVO {
 	}
 	public void setPossuiPropostaCom(String possuiPropostaCom) {
 		this.possuiPropostaCom = possuiPropostaCom;
+	}
+	public String getDistancia() {
+		return distancia;
+	}
+	public void setDistancia(String distancia) {
+		this.distancia = distancia;
 	}
 	}

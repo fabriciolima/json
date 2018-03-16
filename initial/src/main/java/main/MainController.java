@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.crypto.KeyGenerator;
@@ -55,8 +57,9 @@ import main.entidade.Cliente;
 import main.entidade.Jogo;
 import main.entidade.JogoCliente;
 import main.entidade.JogoClienteVO;
-import main.entidade.JogoPertoVO;
+import main.entidade.JogoClienteVO;
 import main.entidade.Plataforma;
+import main.entidade.PropostaVO;
 import main.entidade.Troca;
 import main.negocio.JogoNegocio;
 import main.repositorio.ClienteRepository;
@@ -218,18 +221,17 @@ public class MainController {
 	
 	@GetMapping(path="/jogosperto")
 	@CrossOrigin(origins = "*", maxAge = 3600)
-	public @ResponseBody List<JogoPertoVO> getJogosPerto(@RequestParam String pos, Pageable page) {
+	public @ResponseBody List<JogoClienteVO> jogosPerto(@RequestParam String pos, Pageable page) {
 //		String pos = "Point(0 0)";
 		String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
 		System.out.println(page);
 		System.out.println();
 		System.out.println(position);
-		List<JogoPertoVO> retorno = new ArrayList<JogoPertoVO>();
+		List<JogoClienteVO> retorno = new ArrayList<JogoClienteVO>();
 		try {
 			System.out.println("teste");
 			WKTReader reader = new WKTReader();
 			Geometry ponto= reader.read(position);
-		
 		
 			System.out.println(ponto);
 			List<Object[]> list = null;
@@ -248,18 +250,18 @@ public class MainController {
 				String estadojogo = obj[8]==null?"3":obj[8].toString();
 				String idJogoCliente = obj[9].toString();
 				
-				JogoPertoVO jp = new JogoPertoVO();
-				jp.setIdCliente(idcliente);
-				jp.setIdJogo(idjogo);
-				jp.setIdPlataforma(idplataforma);
-				jp.setNomeCliente(nomecliente);
-				jp.setNomeJogo(nomejogo);
-				jp.setNomePlataforma(nomeplataforma);
+				JogoClienteVO jc = new JogoClienteVO();
+				jc.setIdJogo(idjogo);
+				jc.setIdPlataforma(idplataforma);
+//				jc.setNomeCliente(nomecliente);
+				jc.setNomeJogo(nomejogo);
+				jc.setNomePlataforma(nomeplataforma);
 				//Integer distancia = Integer.valueOf(dist);
-				jp.setDistancia(dist);	
-				jp.setEstadoDoJogo(estadojogo);
-				jp.setIdJogoCliente(idJogoCliente);
-				retorno.add(jp);
+				jc.setDistancia(dist);	
+				jc.setEstadoDoJogo(estadojogo);
+				jc.setId(Long.decode( idJogoCliente));
+				retorno.add(jc);
+				
 			}
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -518,7 +520,7 @@ public @ResponseBody String fazProposta(
 		@RequestParam Long idinteresse, 
 		@RequestParam Long idproposta) {
 	
-	String retorno = "error";
+	String retorno = "erro";
 	JogoCliente jcInteresse = jogoClienteRepository.findById(idinteresse);
 	JogoCliente jcProposta = jogoClienteRepository.findById(idproposta);
 	if(jcInteresse!= null && jcProposta != null) {
@@ -532,6 +534,8 @@ public @ResponseBody String fazProposta(
 				troca.setDataCadastro(new Date());
 				troca.setInteresse(jcInteresse);
 				troca.setProposta(jcProposta);
+				troca.setIdClienteInteresse(jcInteresse.getCliente().getId());
+				troca.setIdClienteProposta(jcProposta.getCliente().getId());
 				trocaRepository.save(troca);
 				retorno = "add";
 			} 
@@ -546,6 +550,9 @@ public @ResponseBody String fazProposta(
 public @ResponseBody List<JogoClienteVO> getmeusJogo(
 		@RequestParam String idcliente,
 		@RequestParam String idinteresse) {
+	if (idcliente == null || idcliente.equals("null"))
+		return null;
+	System.out.println(idcliente);
 	Cliente cliente = clienteRepository.findById(Long.parseLong(idcliente));
 	List<JogoCliente> jogoCliente = jogoClienteRepository.findByCliente(cliente);
 
@@ -562,7 +569,7 @@ public @ResponseBody List<JogoClienteVO> getmeusJogo(
 			List<Troca> byInteresse = trocaRepository.findByInteresse(jc);
 			jogoClienteVO.setQtdInteressados(String.valueOf(byInteresse.size()));
 			
-			if(idinteresse != null) {//usado na tela de propostas
+			if(idinteresse != null && !idinteresse.equals("undefined") && idinteresse.length() >1) {//usado na tela de propostas
 				JogoCliente jcInteresse = jogoClienteRepository.findById(Long.parseLong(idinteresse));
 //				List<Troca> listaInteressado = trocaRepository.findByInteressado(jcInteresse);
 				List<Troca> listaInteresseInteressado = trocaRepository.findByInteresseAndProposta(jcInteresse, jc);
@@ -571,8 +578,8 @@ public @ResponseBody List<JogoClienteVO> getmeusJogo(
 					//jogoClienteVO.set
 				}
 				
-			retorno.add(jogoClienteVO);
 			}
+			retorno.add(jogoClienteVO);
 		}
 	}
 	//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
@@ -600,5 +607,142 @@ public @ResponseBody JogoClienteVO getJogoCliente(
 	return jogoClienteVO;
 }
 
+@GetMapping(path="/listaproposta")
+@CrossOrigin(origins = "*", maxAge = 3600)
+public @ResponseBody List<PropostaVO> listaProposta(@RequestParam String idinteresse) {
+	if (idinteresse == null || idinteresse.equals("null"))
+		return null;
+	
+	System.out.println(idinteresse);
+	JogoCliente jc = jogoClienteRepository.findById(Long.decode(idinteresse));
+	List<Troca> listaTroca = trocaRepository.findByInteresse(jc);
+
+	List<PropostaVO> retorno = new ArrayList<PropostaVO>();
+	if(listaTroca.size()>0) {
+		for(Troca t:listaTroca)
+		{
+			PropostaVO propostaVO =new PropostaVO();
+			propostaVO.setIdTroca(t.getId());
+			propostaVO.setIdJogo(t.getProposta().getJogo().getId().toString());
+			propostaVO.setNomeJogo(t.getProposta().getJogo().getNome());
+			propostaVO.setIdPlataforma(t.getProposta().getPlataforma().getId().toString());
+			propostaVO.setNomePlataforma(t.getProposta().getPlataforma().getNome());
+			propostaVO.setDistancia(String.valueOf(t.getInteresse().getCliente().getLocalizacao().distance(t.getProposta().getCliente().getLocalizacao())));
+			System.out.println(t.getInteresse().getCliente().getLocalizacao().distance(t.getProposta().getCliente().getLocalizacao()));
+			retorno.add(propostaVO);
+			}
+		}
+	return retorno;
+}
+
+public double getDistancia(double latitude, double longitude, double latitudePto, double longitudePto){
+    double dlon, dlat, a, distancia;
+    dlon = longitudePto - longitude;
+    dlat = latitudePto - latitude;
+    a = Math.pow(Math.sin(dlat/2),2) + Math.cos(latitude) * Math.cos(latitudePto) * Math.pow(Math.sin(dlon/2),2);
+    distancia = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	return 6378140 * distancia; /* 6378140 is the radius of the Earth in meters*/
+}
+
+
+@PostMapping(path="/chat/add")
+@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+public @ResponseBody Long adicionaChat(@RequestParam String idTroca) {
+	if (idTroca == null || idTroca.equals("null"))
+		return null;
+	Long idChat =null;
+	
+	Troca troca = trocaRepository.findById(Long.parseLong(idTroca));
+	if(troca.getIdChat()==null) {
+		troca.setIdChat(troca.getId());
+		trocaRepository.save(troca);
+	}
+	idChat = troca.getIdChat();
+
+	System.out.println(idChat);
+	
+	return idChat;
+}
+
+@GetMapping(path="/chat/verifica")
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+public @ResponseBody String verificaChat(@RequestParam String idCliente) {
+	if (idCliente == null || idCliente.equals("null"))
+		return null;
+	String retorno = "false";
+	
+	List<Troca> listaTrocaInteresse = trocaRepository.findByIdClienteInteresse(Long.parseLong(idCliente));
+	if (listaTrocaInteresse.size()>0) {
+		retorno = " true";
+	}else {
+		List<Troca> listaTrocaProposta = trocaRepository.findByIdClienteProposta(Long.parseLong(idCliente));
+		if(listaTrocaProposta.size()>0)
+			retorno="true";
+	}
+	
+	return retorno;
+}
+
+@GetMapping(path="/chat/lista")
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String idCliente) {
+	if (idCliente == null || idCliente.equals("null"))
+		return null;
+	
+	List<Map<String, String>> retorno = new ArrayList<Map<String, String>>();
+	
+	
+	
+
+	List<Troca> listaTrocaInteresse = trocaRepository.findByIdClienteInteresse(Long.parseLong(idCliente));
+	if (listaTrocaInteresse.size()>0) {
+		List<Troca> listaTroca = listaTrocaInteresse
+					.stream()
+					.filter(t -> t.getIdChat() != null)
+					.collect(Collectors.toList());
+		for(Troca t: listaTroca) {
+			Map<String, String> item = new HashMap<>();
+			item.put("idTroca", String.valueOf(t.getId()));
+			item.put("interesseNomeJogo", t.getInteresse().getJogo().getNome());
+			item.put("interesseIdJogo", String.valueOf(t.getInteresse().getJogo().getId()));
+			item.put("interesseIdPlataforma", String.valueOf(t.getInteresse().getPlataforma().getId()));
+			item.put("interesseNomePlataforma", t.getInteresse().getPlataforma().getNome());
+			
+			item.put("propostaNomeJogo", t.getProposta().getJogo().getNome());
+			item.put("propostaIdJogo", String.valueOf(t.getProposta().getJogo().getId()));
+			item.put("propostaIdPlataforma", String.valueOf(t.getProposta().getPlataforma().getId()));
+			item.put("propostaNomePlataforma", t.getProposta().getPlataforma().getNome());
+		
+			retorno.add(item);
+		}
+
+	}
+		List<Troca> listaTrocaProposta = trocaRepository.findByIdClienteProposta(Long.parseLong(idCliente));
+		
+		if (listaTrocaProposta.size()>0) {
+			List<Troca> listaTroca = listaTrocaProposta
+						.stream()
+						.filter(t -> t.getIdChat() != null)
+						.collect(Collectors.toList());
+			for(Troca t: listaTroca) {
+				Map<String, String> item = new HashMap<>();
+				item.put("id", String.valueOf(t.getId()));
+				item.put("idTroca", String.valueOf(t.getId()));
+				item.put("interesseNomeJogo", t.getInteresse().getJogo().getNome());
+				item.put("interesseIdJogo", t.getInteresse().getJogo().getNome());
+				item.put("interesseIdPlataforma", t.getInteresse().getJogo().getNome());
+				item.put("interesseNomePlataforma", t.getInteresse().getJogo().getNome());
+				
+				item.put("propostaNomeJogo", t.getProposta().getJogo().getNome());
+				item.put("propostaIdJogo", t.getProposta().getJogo().getNome());
+				item.put("propostaIdPlataforma", t.getProposta().getJogo().getNome());
+				item.put("propostaNomePlataforma", t.getProposta().getJogo().getNome());
+				retorno.add(item);
+			}
+		}
+
+			return retorno;
+		
+}
 
 }

@@ -1,6 +1,10 @@
 package main.repositorio;
 
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 import main.entidade.Cliente;
 
@@ -12,6 +16,7 @@ public interface ClienteRepository extends CrudRepository<Cliente, Long> {
 	Cliente findByUid(String uid);
 	Cliente findById(Long id);
 	//Cliente findBykjlOrderByLocalizacao(Long id);
+	List<Cliente> findAllOrderByLocalizacao(Geometry ponto);
 	
 	
 	
