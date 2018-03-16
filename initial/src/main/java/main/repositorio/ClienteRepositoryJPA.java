@@ -1,10 +1,12 @@
 package main.repositorio;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -31,6 +33,18 @@ public interface ClienteRepositoryJPA extends JpaRepository<Cliente, Long> {
 			countQuery = "SELECT count(*) from cliente\n",
 			nativeQuery = true)	
     List<Object[]> procuraJogosPerto(Geometry localizacao, Pageable pageable);
+
+    @Query(value = "SELECT c.nome nomecliente, c.id idcliente, localizacao, j.id as idjogo, j.nome as nomejogo, p.id idplataforma, p.nome nomeplataforma,"
+			+" st_distance_sphere(:localizacao,localizacao) as dist, jc.estado_do_jogo estadojogo,jc.id idjogocliente " 
+			+"FROM cliente c, jogo j, plataforma p ,jogo_cliente jc "
+			+"WHERE c.id = jc.cliente_id "
+			+"and j.id = jc.jogo_id "
+			+"and p.id = jc.plataforma_id "
+			+"and p.id in :listaplataforma "
+			+"order by dist ", 
+			countQuery = "SELECT count(*) from cliente\n",
+			nativeQuery = true)	
+    List<Object[]> procuraJogosPerto2(@Param("localizacao") Geometry localizacao, @Param("listaplataforma") Collection listaplataforma);
 
 //    Set<Integer> ids = ...;
 //

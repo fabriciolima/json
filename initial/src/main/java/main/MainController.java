@@ -1,32 +1,24 @@
+//      <i class="material-icons waves-effect waves-light
+//                          waves-circle dropdown-button"
+//                    data-activates="submenu" data-gutter="5"
+//                    data-constrainwidth="false">
+//                        more_vert
+//                </i>
 package main;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.imageio.ImageIO;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,10 +31,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.api.client.json.JsonString;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.GeoPoint;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
 import com.nimbusds.jose.JWEHeader;
@@ -56,7 +51,6 @@ import com.vividsolutions.jts.io.WKTReader;
 import main.entidade.Cliente;
 import main.entidade.Jogo;
 import main.entidade.JogoCliente;
-import main.entidade.JogoClienteVO;
 import main.entidade.JogoClienteVO;
 import main.entidade.Plataforma;
 import main.entidade.PropostaVO;
@@ -221,7 +215,7 @@ public class MainController {
 	
 	@GetMapping(path="/jogosperto")
 	@CrossOrigin(origins = "*", maxAge = 3600)
-	public @ResponseBody List<JogoClienteVO> jogosPerto(@RequestParam String pos, Pageable page) {
+	public @ResponseBody List<JogoClienteVO> jogosPerto(@RequestParam String pos, @RequestParam String listaPlataforma, Pageable page) {
 //		String pos = "Point(0 0)";
 		String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
 		System.out.println(page);
@@ -235,6 +229,8 @@ public class MainController {
 		
 			System.out.println(ponto);
 			List<Object[]> list = null;
+			
+			
 			if(ponto != null)
 				list = clienteRepositoryJPA.procuraJogosPerto(ponto,page);
 			for(Object[] obj:list) {
@@ -271,109 +267,6 @@ public class MainController {
 		return retorno;
 	}
 	
-	//@GetMapping(path="/p")
-	public @ResponseBody String processa() {
-		Iterable<Jogo> listaJogo = jogoRepository.findAll();
-		//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
-		
-		for(Jogo j:listaJogo) 
-		{
-			File fJPG = new File("images/"+String.valueOf(j.getId())+".JPG");
-			File fPNG = new File("images/"+String.valueOf(j.getId())+".PNG");
-			if(fPNG.exists() || fJPG.exists()) { 
-			    System.out.println(String.valueOf(j.getId()).concat(" - OK"));
-			}
-			else
-			try {
-		        
-				// can only grab first 100 results
-				//String userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36";
-				String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
-				String url = "https://www.google.com/search?site=imghp&tbm=isch&source=hp&gws_rd=cr&q=cover game ";
-				String filename = "A20/B22b#öA\\BC#Ä$%ld_ma.la.xps";
-				
-				url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", " "));
-
-				List<String> resultUrls = new ArrayList<String>();
-
-				Document doc = Jsoup.connect(url)
-						.userAgent(userAgent).referrer("https://www.google.com/").get();
-
-				Elements elements = doc.select("div.rg_meta");
-
-				JSONObject jsonObject;
-				for (Element element : elements) {
-					try {
-						if (element.childNodeSize() > 0) {
-							jsonObject = (JSONObject) new JSONParser().parse(element.childNode(0).toString());
-							resultUrls.add((String) jsonObject.get("ou"));
-						}
-					} catch (Exception e) {
-					
-					}
-				}
-
-				for (String imageUrl : resultUrls) 
-				{
-					try {
-						if(imageUrl.indexOf(".png") > 0)
-							imageUrl = imageUrl.substring(0,imageUrl.indexOf(".png")+4);
-						else
-							imageUrl = imageUrl.substring(0,imageUrl.indexOf(".jpg")+4);
-						System.out.println(imageUrl);
-//						String imageUrl = resultUrls.get(0);
-						String arq = imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length());
-						String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
-						String arqSemExt = arq.substring(0, arq.length()-4);
-
-						//System.out.println(imageUrl+" -> "+imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length()));
-						System.out.println(j.getId());
-						//saveProxy(imageUrl, "images/"+String.valueOf(j.getId())+"."+arqExt );
-						System.out.println("ok");
-						break;
-					} catch (Exception e) {
-						System.out.println("erro: "+ imageUrl);
-						//System.out.println(e.getMessage());
-					}
-				}
-			}catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-			return "Sucesso";
-
-	}
-	
-//	public static void saveProxy(String imageUrl, String arq) {
-//		String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";	
-//		URL url = new URL(imageUrl);
-//		HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-//	    httpcon.addRequestProperty("User-Agent", userAgent);
-//
-//	    BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
-//
-//
-//			// Open a connection to the URL using the proxy information.
-//			InputStream inStream = httpcon.getInputStream();
-//
-//			// BufferedImage image = ImageIO.read(url);
-//			// Use the InputStream flavor of ImageIO.read() instead.
-//			BufferedImage image = ImageIO.read(inStream);
-//
-//			String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
-//			ImageIO.write(image, arqExt, new File(arq));
-//
-//	}
-//
-//public static void saveImageByUrl(String urlString, String arq)throws Exception {
-//		
-//	BufferedImage image = null;
-//		URL url = new URL(urlString);
-//		image = ImageIO.read(url);
-//		File toCreate = new File(arq);
-//		String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
-//		ImageIO.write(image, arqExt, toCreate);	
-//}
 
 public @ResponseBody void inserejogoliente(@RequestParam String qtde) {
 	double minLat = -89.00;
@@ -742,7 +635,40 @@ public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String id
 		}
 
 			return retorno;
+}
 		
+
+
+@GetMapping(path="/teste2")
+@CrossOrigin(origins = "*", maxAge = 3600)
+public @ResponseBody String jogosPerto2() throws Exception {
+	String pos = "Point(0 0)";
+	String listaPlataforma="[11]";
+	String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
+	
+		WKTReader reader = new WKTReader();
+		Geometry ponto= reader.read(position);
+	
+		System.out.println(ponto);
+		List<Object[]> list = null;
+		
+
+		Gson gson = new Gson();
+		//ArrayList<ArrayList<String>> list2 = gson.fromJson(listaPlataforma, new TypeToken<ArrayList<ArrayList<String>>>() {}.getType());
+		ArrayList<String> list2 = gson.fromJson(listaPlataforma, new TypeToken<ArrayList<String>>() {}.getType());
+
+//		ArrayList<String> listaPlataforma = gson.fromJson(listaPlataforma,  ArrayList<String>().class() );
+		List<Object[]> listateste = clienteRepositoryJPA.procuraJogosPerto2(ponto,list2);
+		
+		for(Object[] obj:listateste) {
+			System.out.println(obj[5].toString());
+		}
+		System.out.println();
+		System.out.println();
+		System.out.println(listateste.size());
+		
+		return gson.toJson(listateste);
+
 }
 
 }

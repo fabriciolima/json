@@ -2,9 +2,10 @@ package main.repositorio;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
-import main.entidade.Cliente;
 import main.entidade.JogoCliente;
 import main.entidade.Troca;
 
@@ -13,6 +14,9 @@ import main.entidade.Troca;
 
 public interface TrocaRepository extends CrudRepository<Troca, Long> {
 
+	@Query("select t from Troca t where t.idClienteInteresse = :interesse or t.idClienteProposta= :proposta")
+	 List<Troca[]>  findByIdClienteInteresseOrIdClienteProposta(@Param("interesse") String interesse,
+	                                 @Param("proposta") String proposta);	 
 	List<Troca> findByInteresse(JogoCliente jc);
 	List<Troca> findByProposta(JogoCliente jc);
 	//List<Troca> findByInteresseProposta(JogoCliente interesse, JogoCliente proposta);
@@ -27,8 +31,6 @@ public interface TrocaRepository extends CrudRepository<Troca, Long> {
 	
 	
 	
-	//List<Jogo> findByDataModificadoGreaterThanEqual(Date data);
-	//List<Jogo> findAllByDataModificadoGreaterThanEqual(Date data);
-//	@Query("SELECT jc FROM JogoCliente jc WHERE LOWER(p.lastName) = LOWER(:localizacao)")
-//    public List<JogoCliente> procura(@Param("localizacao") String localizacao);
+
+
 }

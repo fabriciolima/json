@@ -12,6 +12,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTReader;
 
 import java.io.FileInputStream;
 import java.util.HashMap;
@@ -23,21 +25,27 @@ public class Testes {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		try {
-			FileInputStream serviceAccount;
-			serviceAccount = new FileInputStream("jogos-usados-firebase-adminsdk-syxx2-fef0113d56.json");
-		FirebaseOptions options = new FirebaseOptions.Builder()
-				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
-//				.setDatabaseUrl("https://jogos-usados.firebaseio.com")
-//				.setProjectId("jogos-usados")
-				.build();
-		
-		FirebaseApp.initializeApp(options);
-		Firestore firestore = FirestoreClient.getFirestore();
-		
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			FileInputStream serviceAccount;
+//			serviceAccount = new FileInputStream("jogos-usados-firebase-adminsdk-syxx2-fef0113d56.json");
+//		FirebaseOptions options = new FirebaseOptions.Builder()
+//				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+////				.setDatabaseUrl("https://jogos-usados.firebaseio.com")
+////				.setProjectId("jogos-usados")
+//				.build();
+//		
+//		FirebaseApp.initializeApp(options);
+//		Firestore firestore = FirestoreClient.getFirestore();
+//		
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+	
+	
+	
+
+	
+	
 	}
 
 }
