@@ -7,7 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 public class JogoCliente {
@@ -16,6 +20,9 @@ public class JogoCliente {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private Integer estadoDoJogo;
+	@OneToMany
+	@Cascade(CascadeType.ALL)
+	Troca troca;
 	@ManyToOne @NotNull
 	private Cliente cliente;
 	@ManyToOne @NotNull
