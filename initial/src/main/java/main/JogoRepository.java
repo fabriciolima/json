@@ -19,4 +19,5 @@ public interface JogoRepository extends CrudRepository<Jogo, Long> {
 	List<Jogo> findByNome(String Nome);
 	Page<Jogo> findAll(Pageable pageable);
 	Jogo findByUid(String uid);
+	Jogo findById(Long idJogo);
 }
