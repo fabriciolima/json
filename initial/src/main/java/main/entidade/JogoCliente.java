@@ -21,7 +21,7 @@ public class JogoCliente {
 	private Long id;
 	private Integer estadoDoJogo;
 	@OneToMany
-	@Cascade(CascadeType.ALL)
+	//@Cascade(CascadeType.ALL)
 	Troca troca;
 	@ManyToOne @NotNull
 	private Cliente cliente;
