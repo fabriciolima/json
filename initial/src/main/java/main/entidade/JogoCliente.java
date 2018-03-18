@@ -1,6 +1,7 @@
 package main.entidade;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,8 +22,8 @@ public class JogoCliente {
 	private Long id;
 	private Integer estadoDoJogo;
 	@OneToMany
-	//@Cascade(CascadeType.ALL)
-	Troca troca;
+	@Cascade(CascadeType.ALL)
+	private List<Troca> listaTroca;
 	@ManyToOne @NotNull
 	private Cliente cliente;
 	@ManyToOne @NotNull
