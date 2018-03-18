@@ -661,4 +661,22 @@ public @ResponseBody String jogosPerto2() throws Exception {
 
 }
 
+@PostMapping(path="/jogo/d")
+@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+public @ResponseBody String apagaJogoCliente(@RequestParam String jc,@RequestParam String i) {
+	
+	String retorno="Erro";
+
+	
+	JogoCliente jcliente = jogoClienteRepository.findById(Long.valueOf(jc));
+	if(jcliente.getCliente().getId().equals(Long.decode(i))) {
+		jogoClienteRepository.delete(jcliente);
+		retorno = "Sucesso";
+	}
+	
+	return retorno;
+}
+
+
+
 }
