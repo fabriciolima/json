@@ -612,13 +612,13 @@ public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String id
 				item.put("id", String.valueOf(t.getId()));
 				item.put("idTroca", String.valueOf(t.getId()));
 				item.put("interesseNomeJogo", t.getInteresse().getJogo().getNome());
-				item.put("interesseIdJogo", t.getInteresse().getJogo().getId());
-				item.put("interesseIdPlataforma", t.getInteresse().getPlataforma().getId()));
+				item.put("interesseIdJogo", String.valueOf(t.getInteresse().getJogo().getId()));
+				item.put("interesseIdPlataforma", String.valueOf(t.getInteresse().getPlataforma().getId()));
 				item.put("interesseNomePlataforma", t.getInteresse().getPlataforma().getNome());
 				
 				item.put("propostaNomeJogo", t.getProposta().getJogo().getNome());
-				item.put("propostaIdJogo", t.getProposta().getJogo().getId());
-				item.put("propostaIdPlataforma", t.getProposta().getJogo().getId());
+				item.put("propostaIdJogo", String.valueOf(t.getProposta().getJogo().getId()));
+				item.put("propostaIdPlataforma", String.valueOf(t.getProposta().getJogo().getId()));
 				item.put("propostaNomePlataforma", t.getProposta().getPlataforma().getNome());
 				retorno.add(item);
 			}
