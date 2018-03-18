@@ -585,8 +585,6 @@ public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String id
 	List<Map<String, String>> retorno = new ArrayList<Map<String, String>>();
 	
 	
-	
-
 	List<Troca> listaTrocaInteresse = trocaRepository.findByIdClienteInteresse(Long.parseLong(idCliente));
 	if (listaTrocaInteresse.size()>0) {
 		List<Troca> listaTroca = listaTrocaInteresse
@@ -622,14 +620,14 @@ public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String id
 				item.put("id", String.valueOf(t.getId()));
 				item.put("idTroca", String.valueOf(t.getId()));
 				item.put("interesseNomeJogo", t.getInteresse().getJogo().getNome());
-				item.put("interesseIdJogo", t.getInteresse().getJogo().getNome());
-				item.put("interesseIdPlataforma", t.getInteresse().getJogo().getNome());
-				item.put("interesseNomePlataforma", t.getInteresse().getJogo().getNome());
+				item.put("interesseIdJogo", t.getInteresse().getJogo().getId());
+				item.put("interesseIdPlataforma", t.getInteresse().getPlataforma().getId()));
+				item.put("interesseNomePlataforma", t.getInteresse().getPlataforma().getNome());
 				
 				item.put("propostaNomeJogo", t.getProposta().getJogo().getNome());
-				item.put("propostaIdJogo", t.getProposta().getJogo().getNome());
-				item.put("propostaIdPlataforma", t.getProposta().getJogo().getNome());
-				item.put("propostaNomePlataforma", t.getProposta().getJogo().getNome());
+				item.put("propostaIdJogo", t.getProposta().getJogo().getId());
+				item.put("propostaIdPlataforma", t.getProposta().getJogo().getId());
+				item.put("propostaNomePlataforma", t.getProposta().getPlataforma().getNome());
 				retorno.add(item);
 			}
 		}
