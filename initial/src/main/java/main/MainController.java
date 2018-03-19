@@ -153,10 +153,6 @@ public class MainController {
 		
 		try {
 			
-			if(db==null) {
-				FireBaseDB fire = new FireBaseDB();
-				db = fire.getDb();
-			}
 			GeoPoint localizacao = new GeoPoint(Double.parseDouble(lat), Double.parseDouble(lon));
 			WKTReader reader = new WKTReader();
 			Geometry ponto= reader.read("Point(".concat(lon).concat(" ").concat(lat).concat(")").replaceAll(",", "."));
@@ -164,15 +160,11 @@ public class MainController {
 			Cliente c = clienteRepository.findByUid(uid);
 			if(c == null) {
 				c= new Cliente();
-				Map<String, Object> cliente = new HashMap<>();
-				cliente.put("nome",nome);
-				cliente.put("localizacao", localizacao);
-				ApiFuture<DocumentReference> clienteRef = db.collection("cliente").add(cliente);
-				
 				
 				c.setNome(nome);
-				c.setUid(clienteRef.get().getId());
+				c.setUid(uid);
 				c.setLocalizacao(ponto);
+			
 				clienteRepository.save(c);
 				retorno = c.getId().toString();
 				System.out.println("novo Cliente ID: " + retorno);
@@ -207,7 +199,7 @@ public class MainController {
 	
 	@GetMapping(path="/jogosperto")
 	@CrossOrigin(origins = "*", maxAge = 3600)
-	public @ResponseBody List<JogoClienteVO> jogosPerto(@RequestParam String pos, Pageable page) {
+	public @ResponseBody List<JogoClienteVO> jogosPerto(@RequestParam String pos, String id, Pageable page) {
 //		String pos = "Point(0 0)";
 		String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
 		System.out.println(page);
@@ -226,30 +218,31 @@ public class MainController {
 			if(ponto != null)
 				list = clienteRepositoryJPA.procuraJogosPerto(ponto,page);
 			for(Object[] obj:list) {
-				String nomecliente = obj[0].toString();
-				String idcliente  = obj[1].toString();
-				String localizacao = obj[2].toString();
-				String idjogo = obj[3].toString();
-				String nomejogo = obj[4].toString();
-				String idplataforma = obj[5].toString();
-				String nomeplataforma = obj[6].toString();
-				String dist  = obj[7].toString().replaceAll(".0", "");
-				//System.out.println(obj[8]);
-				String estadojogo = obj[8]==null?"3":obj[8].toString();
-				String idJogoCliente = obj[9].toString();
-				
-				JogoClienteVO jc = new JogoClienteVO();
-				jc.setIdJogo(idjogo);
-				jc.setIdPlataforma(idplataforma);
-//				jc.setNomeCliente(nomecliente);
-				jc.setNomeJogo(nomejogo);
-				jc.setNomePlataforma(nomeplataforma);
-				//Integer distancia = Integer.valueOf(dist);
-				jc.setDistancia(dist);	
-				jc.setEstadoDoJogo(estadojogo);
-				jc.setId(Long.decode( idJogoCliente));
-				retorno.add(jc);
-				
+				if(!obj[1].toString().equals(id)) {
+					String nomecliente = obj[0].toString();
+					String idcliente  = obj[1].toString();
+					String localizacao = obj[2].toString();
+					String idjogo = obj[3].toString();
+					String nomejogo = obj[4].toString();
+					String idplataforma = obj[5].toString();
+					String nomeplataforma = obj[6].toString();
+					String dist  = obj[7].toString().replaceAll(".0", "");
+					//System.out.println(obj[8]);
+					String estadojogo = obj[8]==null?"3":obj[8].toString();
+					String idJogoCliente = obj[9].toString();
+					
+					JogoClienteVO jc = new JogoClienteVO();
+					jc.setIdJogo(idjogo);
+					jc.setIdPlataforma(idplataforma);
+	//				jc.setNomeCliente(nomecliente);
+					jc.setNomeJogo(nomejogo);
+					jc.setNomePlataforma(nomeplataforma);
+					//Integer distancia = Integer.valueOf(dist);
+					jc.setDistancia(dist);	
+					jc.setEstadoDoJogo(estadojogo);
+					jc.setId(Long.decode( idJogoCliente));
+					retorno.add(jc);
+				}
 			}
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -362,7 +355,7 @@ public String getEncrypt(String dado) throws Exception {
 @GetMapping(path="/teste")
 public @ResponseBody String testes() {
 
-	return "server ok";
+	return "server ok2";
 }
 
 @PostMapping(path="/jogo/troca/add") // Map ONLY GET Requests
@@ -671,6 +664,21 @@ public @ResponseBody String apagaJogoCliente(@RequestParam String jc,@RequestPar
 	JogoCliente jcliente = jogoClienteRepository.findById(Long.valueOf(jc));
 	if(jcliente.getCliente().getId().equals(Long.decode(i))) {
 		jogoClienteRepository.delete(jcliente);
+		retorno = "Sucesso";
+	}
+	
+	return retorno;
+}
+
+@PostMapping(path="/cliente/d")
+@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+public @ResponseBody String apagaCliente(@RequestParam String u,@RequestParam String i) {
+	
+	String retorno="Erro";
+	
+	Cliente cliente = clienteRepository.findById(Long.valueOf(i));
+	if(cliente.getUid().equals(u)) {
+		//clienteRepository.delete(cliente);
 		retorno = "Sucesso";
 	}
 	
