@@ -677,4 +677,6 @@ public @ResponseBody String apagaJogoCliente(@RequestParam String jc,@RequestPar
 	return retorno;
 }
 
+}
+
 

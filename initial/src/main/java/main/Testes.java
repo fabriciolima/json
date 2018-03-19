@@ -7,25 +7,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
 
-import main.entidade.Jogo;
 import main.repositorio.ClienteRepositoryJPA;
 
 
@@ -56,7 +45,7 @@ public class Testes {
 			
 //		System.out.println(p1.met.distance(p2)* (Math.PI / 180) * 6378137);
 				//System.out.println(getDistancia(Double.valueOf(0),Double.valueOf(0.002),Double.valueOf(2),Double.valueOf(0.01)));
-	processa();
+	
 	System.out.println(" fim");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -76,80 +65,80 @@ public class Testes {
 
 
 	//@GetMapping(path="/p")
-		public static void processa() {
-			//Iterable<Jogo> listaJogo = jogoRepository.findAll();
-			//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
-			
-			//for(Jogo j:listaJogo)
-			{
-				Jogo j = new Jogo();
-				j.setId(1L);
-				j.setNome("far cry 5");
-				File fJPG = new File("images/"+String.valueOf(j.getId())+".JPG");
-				File fPNG = new File("images/"+String.valueOf(j.getId())+".PNG");
-				if(fPNG.exists() || fJPG.exists()) { 
-				    System.out.println(String.valueOf(j.getId()).concat(" - OK"));
-				}
-				else
-				try {
-			        
-					// can only grab first 100 results
-					//String userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36";
-					String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
-					String url = "http://www.trocajogo.com.br/pt-BR/search?k= ";
-					String filename = "A20/B22b#öA\\BC#Ä$%ld_ma.la.xps";
-					
-					url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", " "));
-
-					List<String> resultUrls = new ArrayList<String>();
-
-					Document doc = Jsoup.connect(url)
-							.userAgent(userAgent).referrer("https://www.google.com/").get();
-
-					Elements elements = doc.select("img");
-
-					JSONObject jsonObject;
-					for (Element element : elements) {
-						try {
-							if (element.childNodeSize() > 0) {
-								jsonObject = (JSONObject) new JSONParser().parse(element.childNode(0).toString());
-								resultUrls.add((String) jsonObject.get("ou"));
-							}
-						} catch (Exception e) {
-						
-						}
-					}
-
-					for (String imageUrl : resultUrls) 
-					{
-						try {
-							if(imageUrl.indexOf(".png") > 0)
-								imageUrl = imageUrl.substring(0,imageUrl.indexOf(".png")+4);
-							else
-								imageUrl = imageUrl.substring(0,imageUrl.indexOf(".jpg")+4);
-							System.out.println(imageUrl);
-//							String imageUrl = resultUrls.get(0);
-							String arq = imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length());
-							String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
-							String arqSemExt = arq.substring(0, arq.length()-4);
-
-							//System.out.println(imageUrl+" -> "+imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length()));
-							System.out.println(j.getId());
-							saveProxy(imageUrl, "images/"+String.valueOf(j.getId())+"."+arqExt );
-							System.out.println("ok");
-							break;
-						} catch (Exception e) {
-							System.out.println("erro: "+ imageUrl);
-							//System.out.println(e.getMessage());
-						}
-					}
-				}catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-	
-
-		}
+//		public static void processa() {
+//			//Iterable<Jogo> listaJogo = jogoRepository.findAll();
+//			//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
+//			
+//			//for(Jogo j:listaJogo)
+//			{
+//				Jogo j = new Jogo();
+//				j.setId(1L);
+//				j.setNome("far cry 5");
+//				File fJPG = new File("images/"+String.valueOf(j.getId())+".JPG");
+//				File fPNG = new File("images/"+String.valueOf(j.getId())+".PNG");
+//				if(fPNG.exists() || fJPG.exists()) { 
+//				    System.out.println(String.valueOf(j.getId()).concat(" - OK"));
+//				}
+//				else
+//				try {
+//			        
+//					// can only grab first 100 results
+//					//String userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36";
+//					String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
+//					String url = "http://www.trocajogo.com.br/pt-BR/search?k= ";
+//					String filename = "A20/B22b#öA\\BC#Ä$%ld_ma.la.xps";
+//					
+//					url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", " "));
+//
+//					List<String> resultUrls = new ArrayList<String>();
+//
+//					Document doc = Jsoup.connect(url)
+//							.userAgent(userAgent).referrer("https://www.google.com/").get();
+//
+//					Elements elements = doc.select("img");
+//
+//					JSONObject jsonObject;
+//					for (Element element : elements) {
+//						try {
+//							if (element.childNodeSize() > 0) {
+//								jsonObject = (JSONObject) new JSONParser().parse(element.childNode(0).toString());
+//								resultUrls.add((String) jsonObject.get("ou"));
+//							}
+//						} catch (Exception e) {
+//						
+//						}
+//					}
+//
+//					for (String imageUrl : resultUrls) 
+//					{
+//						try {
+//							if(imageUrl.indexOf(".png") > 0)
+//								imageUrl = imageUrl.substring(0,imageUrl.indexOf(".png")+4);
+//							else
+//								imageUrl = imageUrl.substring(0,imageUrl.indexOf(".jpg")+4);
+//							System.out.println(imageUrl);
+////							String imageUrl = resultUrls.get(0);
+//							String arq = imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length());
+//							String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
+//							String arqSemExt = arq.substring(0, arq.length()-4);
+//
+//							//System.out.println(imageUrl+" -> "+imageUrl.substring(imageUrl.lastIndexOf("/")+1,imageUrl.length()));
+//							System.out.println(j.getId());
+//							saveProxy(imageUrl, "images/"+String.valueOf(j.getId())+"."+arqExt );
+//							System.out.println("ok");
+//							break;
+//						} catch (Exception e) {
+//							System.out.println("erro: "+ imageUrl);
+//							//System.out.println(e.getMessage());
+//						}
+//					}
+//				}catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//	
+//
+//		}
 
 		public static void saveProxy(String imageUrl, String arq) throws Exception {
 			String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";	
