@@ -34,7 +34,7 @@ public interface ClienteRepositoryJPA extends JpaRepository<Cliente, Long> {
 			nativeQuery = true)	
     List<Object[]> procuraJogosPerto(Geometry localizacao, Pageable pageable);
 
-    @Query(value = "SELECT c.nome nomecliente, c.id idcliente, localizacao, j.id as idjogo, j.nome as nomejogo, p.id idplataforma, p.nome nomeplataforma,"
+    @Query(value = "SELECT c.nome nomecliente, c.id idcliente, ST_AsText(localizacao), j.id as idjogo, j.nome as nomejogo, p.id idplataforma, p.nome nomeplataforma,"
 			+" st_distance_sphere(:localizacao,localizacao) as dist, jc.estado_do_jogo estadojogo,jc.id idjogocliente " 
 			+"FROM cliente c, jogo j, plataforma p ,jogo_cliente jc "
 			+"WHERE c.id = jc.cliente_id "

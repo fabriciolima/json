@@ -528,15 +528,6 @@ public @ResponseBody List<PropostaVO> listaProposta(@RequestParam String idinter
 	return retorno;
 }
 
-public double getDistancia(double latitude, double longitude, double latitudePto, double longitudePto){
-    double dlon, dlat, a, distancia;
-    dlon = longitudePto - longitude;
-    dlat = latitudePto - latitude;
-    a = Math.pow(Math.sin(dlat/2),2) + Math.cos(latitude) * Math.cos(latitudePto) * Math.pow(Math.sin(dlon/2),2);
-    distancia = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-	return 6378140 * distancia; /* 6378140 is the radius of the Earth in meters*/
-}
-
 
 @PostMapping(path="/chat/add")
 @CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
@@ -647,8 +638,7 @@ public @ResponseBody String jogosPerto2() throws Exception {
 	String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
 	
 		WKTReader reader = new WKTReader();
-		Geometry ponto= reader.read(position);
-	
+		Geometry ponto= reader.read(pos);
 		System.out.println(ponto);
 		List<Object[]> list = null;
 		
@@ -661,7 +651,16 @@ public @ResponseBody String jogosPerto2() throws Exception {
 		List<Object[]> listateste = clienteRepositoryJPA.procuraJogosPerto2(ponto,list2);
 		
 		for(Object[] obj:listateste) {
-			System.out.println(obj[5].toString());
+			String localizacao = obj[2].toString();
+			System.out.println(localizacao);
+			Geometry p= reader.read(localizacao);
+			String dist  = obj[7].toString().replaceAll(".0", "");
+			String lat=(String) localizacao.subSequence(7, localizacao.indexOf(""));
+			String lon=(String) localizacao.subSequence( localizacao.indexOf(""),localizacao.length()-1);
+			System.out.println(lat+" - "+lon);
+			//System.out.println(calculaDistancia(0, 0, p.getCoordinates().[0], p.getCoordinate().y) + " - "+ dist);
+			
+			
 		}
 		System.out.println();
 		System.out.println();
@@ -670,5 +669,16 @@ public @ResponseBody String jogosPerto2() throws Exception {
 		return gson.toJson(listateste);
 
 }
+
+public static double calculaDistancia(double latitude, double longitude, double latitudePto, double longitudePto){
+    double dlon, dlat, a, distancia;
+    dlon = longitudePto - longitude;
+    dlat = latitudePto - latitude;
+    a = Math.pow(Math.sin(dlat/2),2) + Math.cos(latitude) * Math.cos(latitudePto) * Math.pow(Math.sin(dlon/2),2);
+    distancia = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+//	return 6378140 * distancia; /* 6378140 is the radius of the Earth in meters*/
+    return 111194.682*distancia;
+}
+
 
 }
