@@ -677,6 +677,7 @@ public @ResponseBody String apagaCliente(@RequestParam String u,@RequestParam St
 	String retorno="Erro";
 	
 	Cliente cliente = clienteRepository.findById(Long.valueOf(i));
+	if(cliente != null)
 	if(cliente.getUid().equals(u)) {
 		//clienteRepository.delete(cliente);
 		retorno = "Sucesso";
