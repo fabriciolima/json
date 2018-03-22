@@ -670,8 +670,8 @@ public @ResponseBody String apagaJogoCliente(@RequestParam String jc,@RequestPar
 	return retorno;
 }
 
-@PostMapping(path="/cliente/d")
-@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+@GetMapping(path="/cliente/d")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public @ResponseBody String apagaCliente(@RequestParam String u,@RequestParam String i) {
 	
 	String retorno="Erro";
@@ -679,7 +679,7 @@ public @ResponseBody String apagaCliente(@RequestParam String u,@RequestParam St
 	Cliente cliente = clienteRepository.findById(Long.valueOf(i));
 	if(cliente != null)
 	if(cliente.getUid().equals(u)) {
-		//clienteRepository.delete(cliente);
+		clienteRepository.delete(cliente);
 		retorno = "Sucesso";
 	}
 	
