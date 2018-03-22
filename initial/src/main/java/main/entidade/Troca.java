@@ -18,8 +18,10 @@ public class Troca {
 	private Long id;
 	@ManyToOne
 	private JogoCliente interesse;
+//	@JoinColumn(name="jogoCliente_id")
 	@ManyToOne
 	private JogoCliente proposta;
+//	@JoinColumn(name="jogoCliente_id")
 	@Index(name = "idclienteinteresse")
 	private Long idClienteInteresse;
 	@Index(name = "idclienteproposta")

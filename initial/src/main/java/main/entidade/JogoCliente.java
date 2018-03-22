@@ -3,6 +3,7 @@ package main.entidade;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,8 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 public class JogoCliente {
@@ -21,9 +22,16 @@ public class JogoCliente {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private Integer estadoDoJogo;
-	@OneToMany
-	@Cascade(CascadeType.ALL)
-	private List<Troca> listaTroca;
+	//@OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+//	@OneToMany(cascade = CascadeType.REMOVE, mappedBy = "jogoCliente")
+//	@OnDelete(action = OnDeleteAction.CASCADE)
+	//@OneToMany(cascade = CascadeType.ALL,mappedBy = "interesse", orphanRemoval = true)
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "interesse")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private List<Troca> listaTrocaInteresse;
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "proposta")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	 private List<Troca> listaTrocaProposta;
 	@ManyToOne @NotNull
 	private Cliente cliente;
 	@ManyToOne @NotNull

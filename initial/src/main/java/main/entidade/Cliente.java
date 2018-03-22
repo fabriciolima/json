@@ -3,6 +3,7 @@ package main.entidade;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,10 +11,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
-
 //@Spatial @Indexed 
 @Entity
 public class Cliente {
@@ -31,7 +34,10 @@ public class Cliente {
 	//@Type(type="org.hibernate.spatial.GeometryType")
 	private Geometry localizacao;
 	
-	@OneToMany(mappedBy="cliente")
+//	@OneToMany(mappedBy="cliente")
+//	@Cascade(CascadeType.ALL)
+	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "cliente")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private List<JogoCliente> listaJogoCliente;
 	
 
