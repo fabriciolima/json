@@ -78,8 +78,8 @@ public class MainController {
 	@Autowired private PlataformaRepository plataformaRepository;
 
 	//@GetMapping(path="/add") // Map ONLY GET Requests
-	@PostMapping(path="/jogo/add") // Map ONLY GET Requests
-	@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+	@GetMapping(path="/jogo/add") // Map ONLY GET Requests
+	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 	@Transactional
 	public @ResponseBody String adicionaJogoCliente (
 			@RequestParam String idPlataforma
@@ -140,8 +140,8 @@ public class MainController {
 	}
 
 	
-	@PostMapping(path="/cliente/add") // Map ONLY GET Requests
-	@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+	@GetMapping(path="/cliente/add") 
+	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 	public @ResponseBody String adicionaCliente(
 			@RequestParam String nome, 
 			@RequestParam String uid, 
@@ -186,7 +186,7 @@ public class MainController {
 	}
 	
 	@GetMapping(path="/jogo")
-	@CrossOrigin(origins = "*", maxAge = 3600)
+	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 	public @ResponseBody Page<Jogo> getJogoDatas(Pageable pageable) {
 		System.out.println(pageable);
 		//List<Jogo> retorno = JogoDAO.procura();
@@ -198,7 +198,7 @@ public class MainController {
 	
 	
 	@GetMapping(path="/jogosperto")
-	@CrossOrigin(origins = "*", maxAge = 3600)
+	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 	public @ResponseBody List<JogoClienteVO> jogosPerto(@RequestParam String pos, String id, Pageable page) {
 //		String pos = "Point(0 0)";
 		String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
@@ -358,8 +358,8 @@ public @ResponseBody String testes() {
 	return "server ok2";
 }
 
-@PostMapping(path="/jogo/troca/add") // Map ONLY GET Requests
-@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+@GetMapping(path="/jogo/troca/add") 
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 @Transactional
 public @ResponseBody String adicionaJogoTroca(
 		@RequestParam String idJogoCliente,
@@ -391,8 +391,8 @@ public @ResponseBody String adicionaJogoTroca(
 	
 }
 
-@PostMapping(path="/fazproposta") // Map ONLY GET Requests
-@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+@GetMapping(path="/fazproposta") // Map ONLY GET Requests
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody String fazProposta(
 		@RequestParam String funcao, 
 		@RequestParam Long idinteresse, 
@@ -424,7 +424,8 @@ public @ResponseBody String fazProposta(
 
 
 @GetMapping(path="/meusjogos")
-@CrossOrigin(origins = "*", maxAge = 3600)
+//@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody List<JogoClienteVO> getmeusJogo(
 		@RequestParam String idcliente,
 		@RequestParam String idinteresse) {
@@ -466,7 +467,7 @@ public @ResponseBody List<JogoClienteVO> getmeusJogo(
 }
 
 @GetMapping(path="/jogocliente")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody JogoClienteVO getJogoCliente(
 		@RequestParam String idjogocliente) {
 	JogoCliente jc = jogoClienteRepository.findById(Long.parseLong(idjogocliente));
@@ -486,7 +487,8 @@ public @ResponseBody JogoClienteVO getJogoCliente(
 }
 
 @GetMapping(path="/listaproposta")
-@CrossOrigin(origins = "*", maxAge = 3600)
+//@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody List<PropostaVO> listaProposta(@RequestParam String idinteresse) {
 	if (idinteresse == null || idinteresse.equals("null"))
 		return null;
@@ -524,7 +526,7 @@ public double getDistancia(double latitude, double longitude, double latitudePto
 
 
 @PostMapping(path="/chat/add")
-@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody Long adicionaChat(@RequestParam String idTroca) {
 	if (idTroca == null || idTroca.equals("null"))
 		return null;
@@ -623,7 +625,7 @@ public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String id
 
 
 @GetMapping(path="/teste2")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody String jogosPerto2() throws Exception {
 	String pos = "Point(0 0)";
 	String listaPlataforma="[11]";
@@ -654,8 +656,8 @@ public @ResponseBody String jogosPerto2() throws Exception {
 
 }
 
-@PostMapping(path="/jogo/d")
-@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+@GetMapping(path="/jogo/d")
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody String apagaJogoCliente(@RequestParam String jc,@RequestParam String i) {
 	
 	String retorno="Erro";
@@ -671,7 +673,7 @@ public @ResponseBody String apagaJogoCliente(@RequestParam String jc,@RequestPar
 }
 
 @GetMapping(path="/cliente/d")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody String apagaCliente(@RequestParam String u,@RequestParam String i) {
 	
 	String retorno="Erro";
