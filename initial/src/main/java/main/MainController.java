@@ -8,7 +8,6 @@ package main;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,19 +30,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.api.client.json.JsonString;
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.GeoPoint;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.JWEHeader;
-import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jose.crypto.DirectEncrypter;
+//import com.nimbusds.jose.EncryptionMethod;
+//import com.nimbusds.jose.JWEAlgorithm;
+//import com.nimbusds.jose.JWEHeader;
+//import com.nimbusds.jose.JWEObject;
+//import com.nimbusds.jose.Payload;
+//import com.nimbusds.jose.crypto.DirectEncrypter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
@@ -55,7 +51,6 @@ import main.entidade.JogoClienteVO;
 import main.entidade.Plataforma;
 import main.entidade.PropostaVO;
 import main.entidade.Troca;
-import main.negocio.JogoNegocio;
 import main.repositorio.ClienteRepository;
 import main.repositorio.ClienteRepositoryJPA;
 import main.repositorio.JogoClienteRepository;
@@ -99,30 +94,16 @@ public class MainController {
 				e.printStackTrace();
 			}
 		}
-		JogoNegocio jogoNegocio = new JogoNegocio();
-		Jogo jogo=null;;
-		try {
-			jogo = jogoNegocio.getJogo(db, jogoRepository, nomeJogo, nomePesquisa);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		Jogo jogo=jogoRepository.findFirst1ByNomeContainingIgnoreCase(nomeJogo);
+				
+		if(jogo==null) {
+			jogo = new Jogo();
+			jogo.setNome(nomeJogo);
+			jogoRepository.save(jogo);
 		}
 		Plataforma plataforma = plataformaRepository.findById(Long.decode(idPlataforma));
 		
-		
-		//salva no firebase
-//		Map<String, Object> jogoCliente = new HashMap<>();
-//		jogoCliente.put("idplataforma", idPlataforma);
-//		jogoCliente.put("idjogo", jogo.getUid());
-//		jogoCliente.put("idcliente",idCliente);
-//		jogoCliente.put("estado", estado);
-//		jogoCliente.put("nomepesquisa",nomePesquisa );
-//		jogoCliente.put("nomejogo", nomeJogo);
-//		jogoCliente.put("dinheiro",dinheiro);
-//		jogoCliente.put("ultimaabertura", new Date());
-//		jogoCliente.put("dataApagado","");
-//		
-//		ApiFuture<DocumentReference> jogoClienteRef = db.collection("jogocliente").add(jogoCliente);
 		
 		//salva no mysql
 		JogoCliente jogoClienteSQL = new JogoCliente();
@@ -136,7 +117,8 @@ public class MainController {
 		jogoClienteSQL.setEstadoDoJogo(Integer.valueOf(estado));
 		jogoClienteRepository.save(jogoClienteSQL);
 		System.out.println("Novo JogoCliente: ".concat(jogoClienteSQL.getId().toString()));
-		return jogoClienteSQL.getId().toString();
+		
+		return "OK";
 	}
 
 	
@@ -330,27 +312,27 @@ public String telRandom() {
     return builder.toString();
 }
 
-public String getEncrypt(String dado) throws Exception {
-	KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-	keyGen.init(128);
-	SecretKey key = keyGen.generateKey();
-
-	// Create the header
-	JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM);
-
-	// Set the plain text
-	Payload payload = new Payload(dado);
-
-	// Create the JWE object and encrypt it
-	JWEObject jweObject = new JWEObject(header, payload);
-	jweObject.encrypt(new DirectEncrypter(key));
-
-	// Serialise to compact JOSE form...
-	String jweString = jweObject.serialize();
-
-	return jweString;
-	
-}
+//public String getEncrypt(String dado) throws Exception {
+//	KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+//	keyGen.init(128);
+//	SecretKey key = keyGen.generateKey();
+//
+//	// Create the header
+//	JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM);
+//
+//	// Set the plain text
+//	Payload payload = new Payload(dado);
+//
+//	// Create the JWE object and encrypt it
+//	JWEObject jweObject = new JWEObject(header, payload);
+//	jweObject.encrypt(new DirectEncrypter(key));
+//
+//	// Serialise to compact JOSE form...
+//	String jweString = jweObject.serialize();
+//
+//	return jweString;
+//	
+//}
 
 @GetMapping(path="/teste")
 public @ResponseBody String testes() {
@@ -688,6 +670,21 @@ public @ResponseBody String apagaCliente(@RequestParam String u,@RequestParam St
 	return retorno;
 }
 
+@GetMapping(path="/jogo/nome")
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+public @ResponseBody List<Map<String, String>> buscaJogoNome(@RequestParam String nome) {
+	
+	List<Map<String, String>> retorno= new ArrayList<Map<String, String>>();
+	List<Jogo> listaNome = jogoRepository.findFirst3ByNomeContainingIgnoreCaseOrderByNome("%".concat(nome).concat("%"));
+	System.out.println(listaNome.size());
+	for(Jogo j: listaNome) {
+		Map<String, String> item = new HashMap<>();
+		item.put("id", String.valueOf(j.getId()));
+		item.put("nome", j.getNome());
+		retorno.add(item);
+	}
+	
+	return retorno;
 }
 
-
+}

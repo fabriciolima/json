@@ -32,7 +32,7 @@ dependencies {
 
     compile("org.springframework.boot:spring-boot-starter-web")
     // https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt
-	compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '5.5'
+	//compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '5.5'
 	
     
     compile 'com.google.firebase:firebase-admin:5.8.0'
