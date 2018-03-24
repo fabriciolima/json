@@ -1,6 +1,5 @@
 package main.entidade;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -29,9 +29,9 @@ public class Cliente {
 	//@Column(unique=true)
 	private String telefone;
 	private Date dataDescadastro;
-	@Column(unique=true)
+	@Index(name = "iduidcliente")
 	private String uid;
-	private LocalDate ultimaVez;
+	private Date ultimaVez;
 	@Column(columnDefinition="Geometry")
 	//@Type(type="org.hibernate.spatial.GeometryType")
 	private Geometry localizacao;
@@ -133,11 +133,11 @@ public class Cliente {
 		this.dataDescadastro = dataDescadastro;
 	}
 
-	public LocalDate getUltimaVez() {
+	public Date getUltimaVez() {
 		return ultimaVez;
 	}
 
-	public void setUltimaVez(LocalDate ultimaVez) {
+	public void setUltimaVez(Date ultimaVez) {
 		this.ultimaVez = ultimaVez;
 	}	
 }
