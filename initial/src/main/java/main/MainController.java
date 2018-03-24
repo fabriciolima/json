@@ -7,6 +7,7 @@
 package main;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,8 +16,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -189,7 +188,11 @@ public class MainController {
 		System.out.println(position);
 		List<JogoClienteVO> retorno = new ArrayList<JogoClienteVO>();
 		try {
-			System.out.println("teste");
+
+			Cliente cliente = clienteRepository.findById(Long.valueOf(id));
+			cliente.setUltimaVez(LocalDate.now());
+			clienteRepository.save(cliente);
+			
 			WKTReader reader = new WKTReader();
 			Geometry ponto= reader.read(position);
 		

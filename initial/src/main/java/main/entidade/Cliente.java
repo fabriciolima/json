@@ -1,5 +1,6 @@
 package main.entidade;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class Cliente {
 	private Date dataDescadastro;
 	@Column(unique=true)
 	private String uid;
+	private LocalDate ultimaVez;
 	@Column(columnDefinition="Geometry")
 	//@Type(type="org.hibernate.spatial.GeometryType")
 	private Geometry localizacao;
@@ -129,5 +131,13 @@ public class Cliente {
 
 	public void setDataDescadastro(Date dataDescadastro) {
 		this.dataDescadastro = dataDescadastro;
+	}
+
+	public LocalDate getUltimaVez() {
+		return ultimaVez;
+	}
+
+	public void setUltimaVez(LocalDate ultimaVez) {
+		this.ultimaVez = ultimaVez;
 	}	
 }
