@@ -335,7 +335,7 @@ public String telRandom() {
 @GetMapping(path="/teste")
 public @ResponseBody String testes() {
 
-	return "server ok2";
+	return "server ok3";
 }
 
 @GetMapping(path="/jogo/troca/add") 
