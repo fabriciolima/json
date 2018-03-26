@@ -1,9 +1,3 @@
-//      <i class="material-icons waves-effect waves-light
-//                          waves-circle dropdown-button"
-//                    data-activates="submenu" data-gutter="5"
-//                    data-constrainwidth="false">
-//                        more_vert
-//                </i>
 package main;
 
 import java.text.DecimalFormat;
@@ -103,8 +97,7 @@ public class MainController {
 		jogoClienteSQL.setDataUltimaAbertura(new Date());
 		jogoClienteSQL.setEstadoDoJogo(Integer.valueOf(estado));
 		jogoClienteRepository.save(jogoClienteSQL);
-		System.out.println("Novo JogoCliente: ".concat(jogoClienteSQL.getId().toString()));
-		
+
 		return "Sucesso";
 	}
 
@@ -118,7 +111,6 @@ public class MainController {
 			@RequestParam String lon) {
 
 		String retorno="";
-		System.out.println(lat);
 		
 		try {
 			
@@ -141,7 +133,6 @@ public class MainController {
 				clienteRepository.save(c);
 			}
 			retorno = String.valueOf(c.getId());
-			System.out.println("novo Cliente ID: " + retorno);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -161,7 +152,6 @@ public class MainController {
 	@GetMapping(path="/jogo")
 	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 	public @ResponseBody Page<Jogo> getJogoDatas(Pageable pageable) {
-		System.out.println(pageable);
 		//List<Jogo> retorno = JogoDAO.procura();
 		//List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
 		Page<Jogo> retorno = jogoRepository.findAll(pageable);
@@ -177,9 +167,8 @@ public class MainController {
 		String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
 		List<JogoClienteVO> retorno = new ArrayList<JogoClienteVO>();
 		try {
-			System.out.println(id);
 			if(!(id == null || id.equals("") ||id.equals("null"))){
-				Cliente cliente = clienteRepository.findById(Long.valueOf(id));
+				Cliente cliente = clienteRepository.findById(Long.decode(id));
 				cliente.setUltimaVez(new Date());
 				clienteRepository.save(cliente);
 			}
@@ -354,7 +343,6 @@ public @ResponseBody String adicionaJogoTroca(
 			e.printStackTrace();
 		}
 	}
-	System.out.println(jogosTroca);
 	//salva no firebase
 //	Map<String, Object> jogoCliente = new HashMap<>();
 //	jogoCliente.put("idplataforma", idPlataforma);
@@ -411,7 +399,6 @@ public @ResponseBody List<JogoClienteVO> getmeusJogo(
 		@RequestParam String idinteresse) {
 	if (idcliente == null || idcliente.equals("null"))
 		return null;
-	System.out.println(idcliente);
 	Cliente cliente = clienteRepository.findById(Long.parseLong(idcliente));
 	List<JogoCliente> jogoCliente = jogoClienteRepository.findByCliente(cliente);
 
@@ -428,7 +415,7 @@ public @ResponseBody List<JogoClienteVO> getmeusJogo(
 			List<Troca> byInteresse = trocaRepository.findByInteresse(jc);
 			jogoClienteVO.setQtdInteressados(String.valueOf(byInteresse.size()));
 			
-			if(idinteresse != null && !idinteresse.equals("undefined") && idinteresse.length() >1) {//usado na tela de propostas
+			if(idinteresse != null && !idinteresse.equals("undefined") && idinteresse.length() >0) {//usado na tela de propostas
 				JogoCliente jcInteresse = jogoClienteRepository.findById(Long.parseLong(idinteresse));
 //				List<Troca> listaInteressado = trocaRepository.findByInteressado(jcInteresse);
 				List<Troca> listaInteresseInteressado = trocaRepository.findByInteresseAndProposta(jcInteresse, jc);
@@ -473,7 +460,6 @@ public @ResponseBody List<PropostaVO> listaProposta(@RequestParam String idinter
 	if (idinteresse == null || idinteresse.equals("null"))
 		return null;
 	
-	System.out.println(idinteresse);
 	JogoCliente jc = jogoClienteRepository.findById(Long.decode(idinteresse));
 	List<Troca> listaTroca = trocaRepository.findByInteresse(jc);
 
@@ -488,7 +474,6 @@ public @ResponseBody List<PropostaVO> listaProposta(@RequestParam String idinter
 			propostaVO.setIdPlataforma(t.getProposta().getPlataforma().getId().toString());
 			propostaVO.setNomePlataforma(t.getProposta().getPlataforma().getNome());
 			propostaVO.setDistancia(String.valueOf(t.getInteresse().getCliente().getLocalizacao().distance(t.getProposta().getCliente().getLocalizacao())));
-			System.out.println(t.getInteresse().getCliente().getLocalizacao().distance(t.getProposta().getCliente().getLocalizacao()));
 			retorno.add(propostaVO);
 			}
 		}
@@ -614,9 +599,7 @@ public @ResponseBody String jogosPerto2() throws Exception {
 		WKTReader reader = new WKTReader();
 		Geometry ponto= reader.read(position);
 	
-		System.out.println(ponto);
 		List<Object[]> list = null;
-		
 
 		Gson gson = new Gson();
 		//ArrayList<ArrayList<String>> list2 = gson.fromJson(listaPlataforma, new TypeToken<ArrayList<ArrayList<String>>>() {}.getType());
