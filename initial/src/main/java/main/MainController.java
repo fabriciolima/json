@@ -96,6 +96,7 @@ public class MainController {
 		jogoClienteSQL.setDataCadastro(new Date());
 		jogoClienteSQL.setDataUltimaAbertura(new Date());
 		jogoClienteSQL.setEstadoDoJogo(Integer.valueOf(estado));
+		jogoClienteSQL.setComentario(dinheiro);
 		jogoClienteRepository.save(jogoClienteSQL);
 
 		return "Sucesso";
@@ -162,10 +163,11 @@ public class MainController {
 	
 	@GetMapping(path="/jogosperto")
 	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
-	public @ResponseBody List<JogoClienteVO> jogosPerto(@RequestParam String pos,String listaPlataforma, String id, Pageable page) {
-//		String pos = "Point(0 0)";
+	public @ResponseBody List<Map<String,String>> jogosPerto(@RequestParam String pos,String listaPlataforma, String id, Pageable page) {
+
 		String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
-		List<JogoClienteVO> retorno = new ArrayList<JogoClienteVO>();
+		List<Map<String, String>> retorno = new ArrayList<Map<String, String>>();
+		
 		try {
 			if(!(id == null || id.equals("") ||id.equals("null"))){
 				Cliente cliente = clienteRepository.findById(Long.decode(id));
@@ -179,38 +181,39 @@ public class MainController {
 
 			//ArrayList<ArrayList<String>> list2 = gson.fromJson(listaPlataforma, new TypeToken<ArrayList<ArrayList<String>>>() {}.getType());
 			ArrayList<String> listPlataforma = gson.fromJson(listaPlataforma, new TypeToken<ArrayList<String>>() {}.getType());
-
-//			ArrayList<String> listaPlataforma = gson.fromJson(listaPlataforma,  ArrayList<String>().class() );
-						
 			
 			List<Object[]> list = null;
 			if(ponto != null)
 				list = clienteRepositoryJPA.procuraJogosPerto(ponto,id,listPlataforma, page);
 			for(Object[] obj:list) {
 				if(!obj[1].toString().equals(id)) {
-					String nomecliente = obj[0].toString();
-					String idcliente  = obj[1].toString();
-					String localizacao = obj[2].toString();
-					String idjogo = obj[3].toString();
-					String nomejogo = obj[4].toString();
-					String idplataforma = obj[5].toString();
-					String nomeplataforma = obj[6].toString();
-					String dist  = obj[7].toString().replaceAll(".0", "");
-					//System.out.println(obj[8]);
-					String estadojogo = obj[8]==null?"3":obj[8].toString();
-					String idJogoCliente = obj[9].toString();
+					Map<String, String> item = new HashMap<>();
 					
-					JogoClienteVO jc = new JogoClienteVO();
-					jc.setIdJogo(idjogo);
-					jc.setIdPlataforma(idplataforma);
-	//				jc.setNomeCliente(nomecliente);
-					jc.setNomeJogo(nomejogo);
-					jc.setNomePlataforma(nomeplataforma);
-					//Integer distancia = Integer.valueOf(dist);
-					jc.setDistancia(dist);	
-					jc.setEstadoDoJogo(estadojogo);
-					jc.setId(Long.decode( idJogoCliente));
-					retorno.add(jc);
+					item.put("nomecliente",obj[0].toString());
+					item.put("idcliente",obj[1].toString());
+					item.put("localizacao",obj[2].toString());
+					item.put("idjogo",obj[3].toString());
+					item.put("nomejogo",obj[4].toString());
+					item.put("idplataforma",obj[5].toString());
+					item.put("nomeplataforma",obj[6].toString());
+					item.put("distancia",obj[7].toString().replaceAll(".0", ""));
+					//System.out.println(obj[8]);
+					item.put("estaDoJogo",obj[8]==null?"3":obj[8].toString());
+					item.put("idJogoCliente",obj[9].toString());
+					item.put("comentario",obj[10].toString());
+					retorno.add(item);
+					
+//					JogoClienteVO jc = new JogoClienteVO();
+//					jc.setIdJogo(idjogo);
+//					jc.setIdPlataforma(idplataforma);
+//	//				jc.setNomeCliente(nomecliente);
+//					jc.setNomeJogo(nomejogo);
+//					jc.setNomePlataforma(nomeplataforma);
+//					//Integer distancia = Integer.valueOf(dist);
+//					jc.setDistancia(dist);	
+//					jc.setEstadoDoJogo(estadojogo);
+//					jc.setId(Long.decode( idJogoCliente));
+//					jc.setComentario(comentario);
 				}
 			}
 		} catch (ParseException e) {

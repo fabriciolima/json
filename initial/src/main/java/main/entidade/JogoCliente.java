@@ -38,14 +38,13 @@ public class JogoCliente {
 	private Jogo jogo;
 	@ManyToOne @NotNull 
 	private Plataforma plataforma;
-	private Date dataModificado;
 	private Date dataCadastro;
-	private Date dataApagado;
 	private Date dataUltimaAbertura;
 	//@Column(columnDefinition="default 0")
 	private Boolean apagado=false;
 	//@Column(columnDefinition="default 0")
 	private Boolean aprovado=false;
+	private String comentario;
 	
 	public Long getId() {
 		return id;
@@ -62,13 +61,6 @@ public class JogoCliente {
 	}
 	public void setAprovado(Boolean aprovado) {
 		this.aprovado = aprovado;
-	}
-	
-	public Date getDataModificado() {
-		return dataModificado;
-	}
-	public void setDataModificado(Date dataModificado) {
-		this.dataModificado = dataModificado;
 	}
 	
 	public Date getDataCadastro() {
@@ -104,12 +96,6 @@ public class JogoCliente {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Date getDataApagado() {
-		return dataApagado;
-	}
-	public void setDataApagado(Date dataApagado) {
-		this.dataApagado = dataApagado;
-	}
 
 	public Date getDataUltimaAbertura() {
 		return dataUltimaAbertura;
@@ -117,6 +103,14 @@ public class JogoCliente {
 
 	public void setDataUltimaAbertura(Date dataUltimaAbertura) {
 		this.dataUltimaAbertura = dataUltimaAbertura;
+	}
+
+	public String getComentario() {
+		return comentario;
+	}
+
+	public void setComentario(String comentario) {
+		this.comentario = comentario;
 	}
 
 

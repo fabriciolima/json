@@ -13,6 +13,7 @@ public class JogoClienteVO {
 	private String idJogo;
 	private String idPlataforma;
 	private String nomeJogo;
+	private String comentario;
 	private String nomePlataforma;
 	private String qtdInteressados;
 	private String possuiPropostaCom;
@@ -94,5 +95,11 @@ public class JogoClienteVO {
 	}
 	public void setDistancia(String distancia) {
 		this.distancia = distancia;
+	}
+	public String getComentario() {
+		return comentario;
+	}
+	public void setComentario(String comentario) {
+		this.comentario = comentario;
 	}
 	}
