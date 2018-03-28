@@ -115,7 +115,7 @@ public class MainController {
 		
 		try {
 			
-			GeoPoint localizacao = new GeoPoint(Double.parseDouble(lat), Double.parseDouble(lon));
+			//GeoPoint localizacao = new GeoPoint(Double.parseDouble(lat), Double.parseDouble(lon));
 			WKTReader reader = new WKTReader();
 			Geometry ponto= reader.read("Point(".concat(lon).concat(" ").concat(lat).concat(")").replaceAll(",", "."));
 
@@ -183,6 +183,8 @@ public class MainController {
 			ArrayList<String> listPlataforma = gson.fromJson(listaPlataforma, new TypeToken<ArrayList<String>>() {}.getType());
 			
 			List<Object[]> list = null;
+			if(id.equals(""))
+				id = "0";
 			if(ponto != null)
 				list = clienteRepositoryJPA.procuraJogosPerto(ponto,id,listPlataforma, page);
 			for(Object[] obj:list) {

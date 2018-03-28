@@ -24,7 +24,7 @@ public interface ClienteRepositoryJPA extends JpaRepository<Cliente, Long> {
 	
 	//@Query(value = "SELECT c.id, localizacao, st_distance(POINT(-30,-11),localizacao) as dist  FROM cliente c order by st_distance(?1,localizacao)", nativeQuery = true)
 	@Query(value = "SELECT c.nome nomecliente, c.id idcliente, localizacao, j.id as idjogo, j.nome as nomejogo, p.id idplataforma, p.nome nomeplataforma,"
-			+" TRUNCATE(st_distance_sphere(:localizacao,localizacao)/1000,0) as dist, jc.estado_do_jogo estadojogo,jc.id idjogocliente, jc.comentario comentario" 
+			+" TRUNCATE(st_distance_sphere(:localizacao,localizacao)/1000,0) as dist, jc.estado_do_jogo estadojogo,jc.id idjogocliente, jc.comentario comentario " 
 			+"FROM cliente c, jogo j, plataforma p ,jogo_cliente jc "
 			+"WHERE c.id = jc.cliente_id "
 			+"and jc.cliente_id != :idCliente "
