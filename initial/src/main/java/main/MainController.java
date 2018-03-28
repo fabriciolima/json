@@ -95,7 +95,7 @@ public class MainController {
 		jogoClienteSQL.setPlataforma(plataforma);
 		jogoClienteSQL.setDataCadastro(new Date());
 		jogoClienteSQL.setDataUltimaAbertura(new Date());
-		jogoClienteSQL.setEstadoDoJogo(Integer.valueOf(estado));
+		jogoClienteSQL.setEstadoDoJogo(estado.equals("novo")?1:2);
 		jogoClienteSQL.setComentario(dinheiro);
 		jogoClienteRepository.save(jogoClienteSQL);
 
@@ -190,17 +190,17 @@ public class MainController {
 					Map<String, String> item = new HashMap<>();
 					
 					item.put("nomecliente",obj[0].toString());
-					item.put("idcliente",obj[1].toString());
+//					item.put("idcliente",obj[1].toString());
 					item.put("localizacao",obj[2].toString());
-					item.put("idjogo",obj[3].toString());
-					item.put("nomejogo",obj[4].toString());
-					item.put("idplataforma",obj[5].toString());
-					item.put("nomeplataforma",obj[6].toString());
+					item.put("idJogo",obj[3].toString());
+					item.put("nomeJogo",obj[4].toString());
+					item.put("idPlataforma",obj[5].toString());
+					item.put("nomePlataforma",obj[6].toString());
 					item.put("distancia",obj[7].toString().replaceAll(".0", ""));
 					//System.out.println(obj[8]);
 					item.put("estaDoJogo",obj[8]==null?"3":obj[8].toString());
 					item.put("idJogoCliente",obj[9].toString());
-					item.put("comentario",obj[10].toString());
+					item.put("comentario",obj[10]==null?"":obj[10].toString());
 					retorno.add(item);
 					
 //					JogoClienteVO jc = new JogoClienteVO();
