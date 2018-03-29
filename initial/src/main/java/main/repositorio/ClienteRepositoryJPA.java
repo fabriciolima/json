@@ -48,7 +48,14 @@ public interface ClienteRepositoryJPA extends JpaRepository<Cliente, Long> {
 			nativeQuery = true)	
     List<Object[]> procuraJogosPerto2(@Param("localizacao") Geometry localizacao, @Param("listaplataforma") Collection listaplataforma);
 
-//    Set<Integer> ids = ...;
+    @Query(value = "SELECT TRUNCATE(st_distance_sphere(:localizacao,localizacao)/1000,0) as dist " 
+			+"FROM cliente c "
+			+"WHERE c.id = :idCliente ",			
+			nativeQuery = true)	
+    String distancia(@Param("localizacao") Geometry localizacao, @Param("idCliente") String idCliente);
+    
+    
+    //    Set<Integer> ids = ...;
 //
 //    MapSqlParameterSource parameters = new MapSqlParameterSource();
 //    parameters.addValue("ids", ids);

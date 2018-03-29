@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.GeoPoint;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 //import com.nimbusds.jose.EncryptionMethod;
@@ -227,6 +226,41 @@ public class MainController {
 	}
 	
 
+	@GetMapping(path="/jogoscliente")
+	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+	public @ResponseBody List<Map<String,String>> jogosVisitar(@RequestParam String idCliente,@RequestParam String idClienteVisita) {
+
+		List<Map<String, String>> retorno = new ArrayList<Map<String, String>>();
+		
+		Cliente clienteVisita = clienteRepository.findById(Long.decode(idClienteVisita));
+		Cliente cliente = clienteRepository.findById(Long.decode(idCliente));
+		
+		List<JogoCliente> jogoCliente = jogoClienteRepository.findByCliente(clienteVisita);
+		String distanciaCliente = clienteRepositoryJPA.distancia(cliente.getLocalizacao(), idCliente);
+		
+		for(JogoCliente jc:jogoCliente) {
+			Map<String, String> item = new HashMap<>();
+			
+			item.put("nomeCliente",jc.getCliente().getNome().substring(0,10));
+			//item.put("localizacao",jc[2].toString());
+			item.put("idJogo",String.valueOf(jc.getJogo().getId()));
+			item.put("nomeJogo",jc.getJogo().getNome());
+			item.put("idPlataforma",String.valueOf(jc.getPlataforma().getId()));
+			item.put("nomePlataforma",jc.getPlataforma().getNome());
+			item.put("distancia",distanciaCliente.replaceAll(".0", ""));
+			//System.out.println(obj[8]);
+			item.put("estaDoJogo",String.valueOf(jc.getEstadoDoJogo()));
+			item.put("idJogoCliente",String.valueOf(jc.getId()));
+			item.put("comentario",jc.getComentario());
+			retorno.add(item);
+			
+			
+		}
+		
+		return retorno;
+	}
+	
+	
 public @ResponseBody void inserejogoliente(@RequestParam String qtde) {
 	double minLat = -89.00;
 	double maxLat = 89.00;      
@@ -483,15 +517,6 @@ public @ResponseBody List<PropostaVO> listaProposta(@RequestParam String idinter
 			}
 		}
 	return retorno;
-}
-
-public double getDistancia(double latitude, double longitude, double latitudePto, double longitudePto){
-    double dlon, dlat, a, distancia;
-    dlon = longitudePto - longitude;
-    dlat = latitudePto - latitude;
-    a = Math.pow(Math.sin(dlat/2),2) + Math.cos(latitude) * Math.cos(latitudePto) * Math.pow(Math.sin(dlon/2),2);
-    distancia = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-	return 6378140 * distancia; /* 6378140 is the radius of the Earth in meters*/
 }
 
 
