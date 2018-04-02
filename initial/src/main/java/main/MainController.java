@@ -1,14 +1,18 @@
 package main;
 
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -53,6 +57,11 @@ import main.repositorio.TrocaRepository;
 public class MainController {
 	
 	Firestore db;
+	private SecretKeySpec key;
+    private Cipher cipher;
+    private int size = 128;
+    private static final Charset CHARSET = Charset.forName("UTF-8"); 
+
 	
 	
 	@Autowired private JogoRepository jogoRepository;
@@ -558,11 +567,17 @@ public @ResponseBody String verificaChat(@RequestParam String idCliente) {
 
 @GetMapping(path="/chat/lista")
 @CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
-public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String idCliente) {
+public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String idCliente) throws Exception {
 	if (idCliente == null || idCliente.equals("null"))
 		return null;
 	
 	List<Map<String, String>> retorno = new ArrayList<Map<String, String>>();
+	
+	setKey("123");
+	System.out.println(idCliente);
+    idCliente = decrypt(idCliente);
+    System.out.println(idCliente);
+    
 	
 	
 	List<Troca> listaTrocaInteresse = trocaRepository.findByIdClienteInteresse(Long.parseLong(idCliente));
@@ -696,6 +711,47 @@ public @ResponseBody List<Map<String, String>> buscaJogoNome(@RequestParam Strin
 	}
 	
 	return retorno;
+}
+
+private static String byteArrayToHexString(byte[] raw) {
+    String hex = "0x";
+    String s = new String(raw);
+    for (int x = 0; x < s.length(); x++) {
+        char[] t = s.substring(x, x + 1).toCharArray();
+        hex += Integer.toHexString((int) t[0]).toUpperCase();
+    }
+    return hex;
+}
+
+public void setKey(String keyText) {
+    byte[] bText = new byte[size];
+    bText = keyText.getBytes(CHARSET);
+    key = new SecretKeySpec(bText, "AES/CTR/NoPadding");
+}
+
+public String encrypt(String message) throws Exception {
+    cipher.init(Cipher.ENCRYPT_MODE, key);
+    byte[] encrypted = cipher.doFinal(message.getBytes());
+    return byteArrayToHexString(encrypted);
+}
+
+private static byte[] hexStringToByteArray(String hex) {
+    Pattern replace = Pattern.compile("^0x");
+    String s = replace.matcher(hex).replaceAll("");
+
+    byte[] b = new byte[s.length() / 2];
+    for (int i = 0; i < b.length; i++) {
+        int index = i * 2;
+        int v = Integer.parseInt(s.substring(index, index + 2), 16);
+        b[i] = (byte) v;
+    }
+    return b;
+}
+
+public String decrypt(String hexCiphertext)throws Exception {
+    cipher.init(Cipher.DECRYPT_MODE, key);
+    byte[] decrypted = cipher.doFinal(hexStringToByteArray(hexCiphertext));
+    return byteArrayToHexString(decrypted);
 }
 
 }
