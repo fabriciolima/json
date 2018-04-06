@@ -79,14 +79,15 @@ public class MainController {
 			@RequestParam String idPlataforma
 			, @RequestParam String idCliente
 			, @RequestParam String estado
-			, @RequestParam String idJogo
+			, @RequestParam String nomeJogoSelecionado
 			, @RequestParam String nomeJogo
 			, @RequestParam String dinheiro )
 	{
 
+		
 		Jogo jogo = null;
-		if(!idJogo.equals("0")) {
-			jogo=jogoRepository.findById(Long.valueOf(idJogo));
+		if(nomeJogoSelecionado.equals(nomeJogo)) {
+			jogo=jogoRepository.findByNome(nomeJogoSelecionado);
 		}
 				
 		if(jogo==null) {
@@ -702,11 +703,12 @@ public @ResponseBody List<Map<String, String>> buscaJogoNome(@RequestParam Strin
 	
 	List<Map<String, String>> retorno= new ArrayList<Map<String, String>>();
 	List<Jogo> listaNome = jogoRepository.findFirst3ByNomeContainingIgnoreCaseOrderByNome("%".concat(nome).concat("%"));
-	System.out.println(listaNome.size());
+
 	for(Jogo j: listaNome) {
 		Map<String, String> item = new HashMap<>();
 		item.put("id", String.valueOf(j.getId()));
 		item.put("nome", j.getNome());
+		item.put("img","http://54.94.219.84:8080/jogo90/".concat(String.valueOf(j.getId())).concat("_90.png"));
 		retorno.add(item);
 	}
 	

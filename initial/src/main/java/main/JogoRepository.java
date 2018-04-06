@@ -17,7 +17,7 @@ public interface JogoRepository extends CrudRepository<Jogo, Long> {
 //	List<Jogo> findByDataModificadoGreaterThanEqual(Date data);
 	//List<Jogo> findAllByDataModificadoGreaterThanEqual(Date data);
 	List<Jogo> findByNomeLike(String Nome);
-	List<Jogo> findByNome(String Nome);
+	Jogo findByNome(String Nome);
 	Page<Jogo> findAll(Pageable pageable);
 //	Jogo findByUid(String uid);
 	Jogo findById(Long idJogo);
