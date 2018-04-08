@@ -1,5 +1,12 @@
 package main;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -14,8 +21,16 @@ import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.imageio.ImageIO;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -704,5 +719,57 @@ public @ResponseBody List<Map<String, String>> buscaJogoNome(@RequestParam Strin
 	
 	return retorno;
 }
+
+@GetMapping(path="/processajogo")
+@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+public @ResponseBody String processa() {
+	Iterable<Jogo> listaJogo = jogoRepository.findAll();
+//	List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
+	
+	for(Jogo j:listaJogo)
+//	Jogo j = jogoRepository.findById(3527L);
+	{
+		File fJPG = new File("images/"+String.valueOf(j.getId())+".JPG");
+//		File fPNG = new File("images/"+String.valueOf(j.getId())+".PNG");
+//		if(fPNG.exists() || fJPG.exists()) { 
+//		    System.out.println(String.valueOf(j.getId()).concat(" - OK"));
+//		}
+//		else
+			String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
+			String url = "http://www.trocajogo.com.br/pt-BR/search?k=";
+			//String url = "https://foter.com/search/instant/?q=+";
+			
+			System.out.println(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+"));
+			url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+")
+					.replaceAll(" ", "+"));
+					//.concat("+pt.wikipedia.org/wiki/"));
+					//.concat("http://cdn.trocajogo.net/files/gameplataforma/capa/"));
+
+			
+	}
+	return "ok";
+}
+
+public static void saveProxy(String imageUrl, String arq) throws Exception {
+	String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";	
+	URL url = new URL(imageUrl);
+	HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+    httpcon.addRequestProperty("User-Agent", userAgent);
+
+    BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
+
+
+		// Open a connection to the URL using the proxy information.
+		InputStream inStream = httpcon.getInputStream();
+
+		// BufferedImage image = ImageIO.read(url);
+		// Use the InputStream flavor of ImageIO.read() instead.
+		BufferedImage image = ImageIO.read(inStream);
+
+		String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
+		ImageIO.write(image, arqExt, new File(arq));
+
+}
+
 
 }

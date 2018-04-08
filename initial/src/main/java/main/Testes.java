@@ -93,7 +93,8 @@ public class Testes {
 					
 					url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+")
 							.replaceAll(" ", "+")
-							.concat("http://cdn.trocajogo.net/files/gameplataforma/capa/"));
+							.concat("pt.wikipedia.org/wiki/"));
+							//.concat("http://cdn.trocajogo.net/files/gameplataforma/capa/"));
 
 					List<String> resultUrls = new ArrayList<String>();
 
