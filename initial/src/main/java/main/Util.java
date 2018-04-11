@@ -1,5 +1,11 @@
 package main;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -8,6 +14,11 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 
 public class Util {
@@ -78,6 +89,66 @@ public class Util {
 	        // Clean out temporary data
 	        Arrays.fill(generatedData, (byte)0);
 	    }
+	}
+
+	public String getUrlCapa(String restUrl) throws Exception {		//="http://ip.jsontest.com/";//"http://54.94.219.84:8080/weplay/json/jogo/nome?nome=wild";
+    
+	
+		String retorno = null;
+		 System.setProperty("http.proxyHost", "proxy");
+		 System.setProperty("http.proxyPort", "8080");
+		 System.setProperty("http.proxyUser", "f092-4");
+         System.setProperty("http.proxyPassword", "q1w2e3r4");
+
+		
+//		 String encoded = new String(Base64.encodeBase64(("f092-4:q1w2e3r4").getBytes()));
+//		 con.setRequestProperty("Proxy-Authorization", "Basic " + encoded);
+//		 Authenticator.setDefault(new ProxyAuth("f092-4","q1w2e3r4"));
+		//
+		System.setProperty("java.net.useSystemProxies", "true");
+
+		String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
+		restUrl = "http://www.trocajogo.com.br/api/SearchGames?rows=10&page=1&termo=".concat(restUrl.replaceAll(" ", "+"));
+		URL url = new URL(restUrl);
+		HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
+		httpcon.addRequestProperty("User-Agent", userAgent);
+
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String line = in.readLine();
+		//line = "{\"result\":true,\"data\":[{\"ImagemCapa\":\"20121203173020_ps3_far-cry-3.jpg\",\"Level\":0,\"Ranking\":0,\"Nome\":\"Far Cry 3\",\"Desejos\":4898,\"Ofertas\":2580,\"Jogo\":{\"Nome\":\"Far Cry 3\",\"Permalink\":\"far-cry-3\"},\"Plataforma\":{\"Nome\":\"Playstation 3\",\"Permalink\":\"ps3\",\"Logotipo\":null,\"Jogos\":null}},{\"ImagemCapa\":\"20121203173029_x360_far-cry-3.jpg\",\"Level\":0,\"Ranking\":0,\"Nome\":\"Far Cry 3\",\"Desejos\":2597,\"Ofertas\":1486,\"Jogo\":{\"Nome\":\"Far Cry 3\",\"Permalink\":\"far-cry-3\"},\"Plataforma\":{\"Nome\":\"XBOX 360\",\"Permalink\":\"xbox360\",\"Logotipo\":null,\"Jogos\":null}}],\"total\":2}";
+
+		JsonParser parser = new JsonParser();
+		// JsonElement element = parser.parse(line);
+		// JsonObject obj = element.getAsJsonObject(); //since you know it's a
+		// JsonObject
+		// Set<Map.Entry<String, JsonElement>> entries = obj.entrySet();//will return
+		// members of your object
+		// for (Map.Entry<String, JsonElement> entry: entries) {
+		// System.out.println(entry.getKey());
+		// System.out.println(entry.getValue());
+		// }
+
+		JsonObject jObj = (JsonObject) parser.parse(line);
+		JsonArray data = jObj.getAsJsonArray("data");
+		Integer desejo = -1;
+		for(JsonElement d: data){
+			Integer novoDesejo = d.getAsJsonObject().get("Desejos").getAsInt();
+			if(desejo < novoDesejo) {
+				retorno = d.getAsJsonObject().get("ImagemCapa").getAsString();
+				desejo = novoDesejo;
+				System.out.println(d.getAsJsonObject().get("Nome").getAsString() + " - " + retorno);
+			}
+		};
+
+		return retorno;
+
 	}
 
 }
