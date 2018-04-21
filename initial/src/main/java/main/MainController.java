@@ -7,18 +7,30 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.imageio.ImageIO;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -160,6 +172,7 @@ public class MainController {
 		String retorno="";
 		
 		try {
+			//String passwdDecrypt = Util.decrypt(password);
 			
 			Cliente c = clienteRepository.findByEmail(email);
 			
@@ -746,39 +759,25 @@ public @ResponseBody String processa() {
 	Iterable<Jogo> listaJogo = jogoRepository.findAll();
 //	List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
 	
-	Util util = new Util();
 	for(Jogo j:listaJogo)
 //	Jogo j = jogoRepository.findById(3527L);
 	{
-//		File fJPG = new File("images/"+String.valueOf(j.getId())+".JPG");
+		File fJPG = new File("images/"+String.valueOf(j.getId())+".JPG");
 //		File fPNG = new File("images/"+String.valueOf(j.getId())+".PNG");
 //		if(fPNG.exists() || fJPG.exists()) { 
 //		    System.out.println(String.valueOf(j.getId()).concat(" - OK"));
 //		}
 //		else
-//			String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
-//			String url = "http://www.trocajogo.com.br/pt-BR/search?k=";
+			String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
+			String url = "http://www.trocajogo.com.br/pt-BR/search?k=";
 			//String url = "https://foter.com/search/instant/?q=+";
 			
-//			System.out.println(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+"));
-//			url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+")
-//					.replaceAll(" ", "+"));
+			System.out.println(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+"));
+			url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+")
+					.replaceAll(" ", "+"));
 					//.concat("+pt.wikipedia.org/wiki/"));
 					//.concat("http://cdn.trocajogo.net/files/gameplataforma/capa/"));
-		String urlCapa = null;
-		try {
-			String arquivo = util.getUrlCapa(j.getNome().replaceAll("[\\\\/:*?\"<>|]", ""));
-//			System.out.println(j.getNome().replaceAll("[\\\\/:*?\"<>|]", ""));
-			if(arquivo != null) {
-			urlCapa = "http://cdn.trocajogo.net/files/gameplataforma/capa/"+arquivo;
-			saveProxy(urlCapa,"imagens/"+j.getId()+".png");
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.out.println("Erro: "+j.getId());
-		}
-		
-		
+
 			
 	}
 	return "ok";
