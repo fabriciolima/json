@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.json.zip.BitInputStream;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
@@ -28,9 +29,11 @@ public class Cliente {
 	private String nome;
 	private String email;
 	private String password;
+	private Integer confirmado;	
 	//@Column(unique=true)
 	private String telefone;
 	private Date dataDescadastro;
+	private Date dataCadastro;
 	@Index(name = "iduidcliente")
 	private String uid;
 	private Date ultimaVez;
@@ -157,5 +160,21 @@ public class Cliente {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+
+	public Integer getConfirmado() {
+		return confirmado;
+	}
+
+	public void setConfirmado(Integer confirmado) {
+		this.confirmado = confirmado;
 	}	
 }

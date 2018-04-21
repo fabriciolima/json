@@ -149,6 +149,8 @@ public class MainController {
 				c.setNome(nome);
 				c.setUid(uid);
 				c.setLocalizacao(ponto);
+				c.setConfirmado(1);
+				c.setDataCadastro(new Date());
 			
 				clienteRepository.save(c);
 			}
@@ -182,8 +184,15 @@ public class MainController {
 				c.setNome(nome);
 				c.setEmail(email);
 				c.setPassword(password);
+				c.setDataCadastro(new Date());
+				c.setConfirmado(0);
 			
-				clienteRepository.save(c);
+				//clienteRepository.save(c);
+				
+				String link=Util.crypt(String.valueOf(c.getId()));
+				Util.sendMail(email, link);
+				
+				
 			}
 			retorno = String.valueOf(c.getId());
 			
@@ -191,6 +200,63 @@ public class MainController {
 			e.printStackTrace();
 			System.out.println("Erro inserindo");
 			
+		}
+		return retorno;
+	}
+
+	
+	@GetMapping(path="/confirmemail") 
+	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+	public @ResponseBody String adicionaClienteEmail(@RequestParam String token) {
+
+		String retorno="";
+		
+		try {
+			Long id = Util.decryptToken(token);
+			
+			Cliente c = clienteRepository.findById(id);
+			
+			if(c == null) {
+				retorno = "Nothing found.";				
+			}else {
+				c.setConfirmado(1);
+				clienteRepository.save(c);
+				retorno = "Agora voce pode aproveitar os recursos de WePlay.";				
+			}
+			
+			
+		} catch (Exception e) {
+			
+			retorno="Something is wrong";
+			
+		}
+		return retorno;
+	}
+	
+
+	@GetMapping(path="/cliente/verificaemail") 
+	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+	public @ResponseBody String verificaClienteEmail(
+			@RequestParam String nome, 
+			@RequestParam String email, 
+			@RequestParam String password) {
+
+		String retorno="";
+		
+		try {
+			Cliente c = clienteRepository.findByEmail(email);
+			
+			if(c == null) {
+				retorno = "erro";				
+			}else {
+				if(c.getConfirmado().equals(1)) {
+					c.setNome(nome);
+					clienteRepository.save(c);
+					retorno = "ok";				
+				}
+			}
+		} catch (Exception e) {
+			retorno="Something is wrong";
 		}
 		return retorno;
 	}

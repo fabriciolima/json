@@ -3,17 +3,23 @@ package main;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Properties;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -150,5 +156,52 @@ public class Util {
 		return retorno;
 
 	}
+	
+	public static void sendMail(String to, String link) {
+
+	      String from = "donotreply@weplay.com";
+	      String host = "localhost";
+	      Properties properties = System.getProperties();
+	      properties.setProperty("mail.smtp.host", host);
+	      Session session = Session.getDefaultInstance(properties);
+
+	      try {
+	         MimeMessage message = new MimeMessage(session);
+
+	         message.setFrom(new InternetAddress(from));
+	         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+
+	         message.setSubject("Confirmation instructions");
+
+	         message.setText("Uma nova conta de usuário foi criada no WePlay. Para ativar sua conta clique no link abaixo:\n" + 
+	         		"\n" + 
+	         		"http://54.94.219.84:8080/weplay/json/teste" +//link 
+	         		"\n\n" + 
+	         		"Caso esteja tendo dificuldades com o link, você também pode copiá-lo e colá-lo no seu navegador de internet.\n" + 
+	         		"\n" + 
+	         		"Atenciosamente,\n" + 
+	         		"\n" + 
+	         		"Equipe do WePlay\n" + 
+	         		"\n" + 
+	         		"");
+
+	         Transport.send(message);
+
+	      } catch (MessagingException mex) {
+	         mex.printStackTrace();
+	      }
+	   }
+
+	public static String crypt(String text) throws Exception 
+    {
+		return text;
+    }
+
+	public static Long decryptToken(String token) {
+		return Long.decode(token);
+	}
+    
+
+	
 
 }
