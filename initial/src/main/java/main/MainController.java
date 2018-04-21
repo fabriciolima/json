@@ -149,6 +149,38 @@ public class MainController {
 		}
 		return retorno;
 	}
+	
+	@GetMapping(path="/cliente/addemail") 
+	@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
+	public @ResponseBody String adicionaClienteEmail(
+			@RequestParam String nome, 
+			@RequestParam String email, 
+			@RequestParam String password) {
+
+		String retorno="";
+		
+		try {
+			
+			Cliente c = clienteRepository.findByEmail(email);
+			
+			if(c == null) {
+				c= new Cliente();
+				
+				c.setNome(nome);
+				c.setEmail(email);
+				c.setPassword(password);
+			
+				clienteRepository.save(c);
+			}
+			retorno = String.valueOf(c.getId());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Erro inserindo");
+			
+		}
+		return retorno;
+	}
 
 	
 	@GetMapping(path="/plataforma")

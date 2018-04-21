@@ -17,6 +17,7 @@ public interface ClienteRepository extends CrudRepository<Cliente, Long> {
 	Cliente findById(Long id);
 	//Cliente findBykjlOrderByLocalizacao(Long id);
 	List<Cliente> findAllOrderByLocalizacao(Geometry ponto);
+	Cliente findByEmail(String email);
 	
 	
 	
