@@ -1,36 +1,15 @@
 package main;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.imageio.ImageIO;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -169,19 +148,19 @@ public class MainController {
 	public @ResponseBody String adicionaClienteEmail(
 			@RequestParam String nome, 
 			@RequestParam String email, 
-			@RequestParam String password) {
+			@RequestParam String password,
+			@RequestParam String esqueci) {
 
 		String retorno="";
 		
 		try {
 			//String passwdDecrypt = Util.decrypt(password);
-			
 			Cliente c = clienteRepository.findByEmail(email);
 			
 			if(c == null) {
 				c= new Cliente();
-				
 				c.setNome(nome);
+				
 				c.setEmail(email);
 				c.setPassword(password);
 				c.setDataCadastro(new Date());
@@ -191,8 +170,13 @@ public class MainController {
 				
 				String link=Util.crypt(String.valueOf(c.getId()));
 				Util.sendMail(email, link);
-				
-				
+			}else if(esqueci.equals("true")) {
+				c.setNovoNome(nome);
+				c.setNovoPassword(password);
+				Util.relembrarPassord(c);
+			}else {
+				if(c.getPassword().equals(password))
+					retorno = String.valueOf(c.getId());
 			}
 			retorno = String.valueOf(c.getId());
 			
@@ -215,13 +199,21 @@ public class MainController {
 			Long id = Util.decryptToken(token);
 			
 			Cliente c = clienteRepository.findById(id);
-			
 			if(c == null) {
 				retorno = "Nothing found.";				
 			}else {
-				c.setConfirmado(1);
-				clienteRepository.save(c);
-				retorno = "Agora voce pode aproveitar os recursos de WePlay.";				
+				if(c.getNovoPassword()!=null && c.getNovoPassword().length()>3) {
+					c.setConfirmado(1);
+					c.setPassword(c.getNovoPassword());
+					c.setNovoPassword(null);
+					c.setNome(c.getNovoNome());
+					c.setNovoNome(null);
+					clienteRepository.save(c);
+				}else {
+					c.setConfirmado(1);
+					clienteRepository.save(c);
+					retorno = "Agora voce pode aproveitar os recursos de WePlay.";
+				}
 			}
 			
 			
@@ -382,31 +374,6 @@ public class MainController {
 	}
 	
 	
-public @ResponseBody void inserejogoliente(@RequestParam String qtde) {
-	double minLat = -89.00;
-	double maxLat = 89.00;      
-	double minLon = -178.00;
-	double maxLon = 178.00;     
-	DecimalFormat df = new DecimalFormat("###.######");
-	WKTReader reader = new WKTReader();
-
-	Map<String, Object> docData = new HashMap<>();
-
-	Firestore db ;//= FirebaseFirestore .getInstance();
-	Iterable<JogoCliente> listaJC = jogoClienteRepository.findAll();
-	for(JogoCliente jc:listaJC) {
-		docData.put("estadojogo", jc.getEstadoDoJogo());
-		docData.put("idjogo", jc.getJogo().getId());
-		docData.put("idcliente", jc.getCliente().getId());
-		docData.put("idplataforma", jc.getPlataforma().getId());
-
-//		ApiFuture<WriteResult> future = db.collection("jogocliente").document(String.valueOf(jc.getId())).set(docData);
-//		// future.get() blocks on response
-//		System.out.println("Update time : " + future.get().getUpdateTime());
-	}
-	
-}
-
 
 //public @ResponseBody void processa2(@RequestParam String qtde) throws ParseException {
 //	double minLat = -89.00;
@@ -739,36 +706,6 @@ public @ResponseBody List<Map<String, String>> listaChat(@RequestParam String id
 		
 
 
-@GetMapping(path="/teste2")
-@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
-public @ResponseBody String jogosPerto2() throws Exception {
-	String pos = "Point(0 0)";
-	String listaPlataforma="[11]";
-	String position = pos.substring(0, 5).toLowerCase().equals("point")?pos:"Point(".concat(pos).concat(")");
-	
-		WKTReader reader = new WKTReader();
-		Geometry ponto= reader.read(position);
-	
-		List<Object[]> list = null;
-
-		Gson gson = new Gson();
-		//ArrayList<ArrayList<String>> list2 = gson.fromJson(listaPlataforma, new TypeToken<ArrayList<ArrayList<String>>>() {}.getType());
-		ArrayList<String> list2 = gson.fromJson(listaPlataforma, new TypeToken<ArrayList<String>>() {}.getType());
-
-//		ArrayList<String> listaPlataforma = gson.fromJson(listaPlataforma,  ArrayList<String>().class() );
-		List<Object[]> listateste = clienteRepositoryJPA.procuraJogosPerto2(ponto,list2);
-		
-		for(Object[] obj:listateste) {
-			System.out.println(obj[5].toString());
-		}
-		System.out.println();
-		System.out.println();
-		System.out.println(listateste.size());
-		
-		return gson.toJson(listateste);
-
-}
-
 @GetMapping(path="/jogo/d")
 @CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
 public @ResponseBody String apagaJogoCliente(@RequestParam String jc,@RequestParam String i) {
@@ -818,57 +755,5 @@ public @ResponseBody List<Map<String, String>> buscaJogoNome(@RequestParam Strin
 	
 	return retorno;
 }
-
-@GetMapping(path="/processajogo")
-@CrossOrigin(origins = "*", allowCredentials = "true", allowedHeaders = "*")
-public @ResponseBody String processa() {
-	Iterable<Jogo> listaJogo = jogoRepository.findAll();
-//	List<Jogo> findByDataModificadoGreaterThanEqual = jogoRepository.findByDataModificadoGreaterThanEqual(new Date());
-	
-	for(Jogo j:listaJogo)
-//	Jogo j = jogoRepository.findById(3527L);
-	{
-		File fJPG = new File("images/"+String.valueOf(j.getId())+".JPG");
-//		File fPNG = new File("images/"+String.valueOf(j.getId())+".PNG");
-//		if(fPNG.exists() || fJPG.exists()) { 
-//		    System.out.println(String.valueOf(j.getId()).concat(" - OK"));
-//		}
-//		else
-			String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";
-			String url = "http://www.trocajogo.com.br/pt-BR/search?k=";
-			//String url = "https://foter.com/search/instant/?q=+";
-			
-			System.out.println(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+"));
-			url = url.concat(j.getNome().replaceAll("[^a-zA-Z0-9\\._]+", "+")
-					.replaceAll(" ", "+"));
-					//.concat("+pt.wikipedia.org/wiki/"));
-					//.concat("http://cdn.trocajogo.net/files/gameplataforma/capa/"));
-
-			
-	}
-	return "ok";
-}
-
-public static void saveProxy(String imageUrl, String arq) throws Exception {
-	String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36";	
-	URL url = new URL(imageUrl);
-	HttpURLConnection httpcon = (HttpURLConnection) url.openConnection();
-    httpcon.addRequestProperty("User-Agent", userAgent);
-
-    BufferedReader in = new BufferedReader(new InputStreamReader(httpcon.getInputStream()));
-
-
-		// Open a connection to the URL using the proxy information.
-		InputStream inStream = httpcon.getInputStream();
-
-		// BufferedImage image = ImageIO.read(url);
-		// Use the InputStream flavor of ImageIO.read() instead.
-		BufferedImage image = ImageIO.read(inStream);
-
-		String arqExt = arq.substring(arq.length()-3,arq.length()).toUpperCase();
-		ImageIO.write(image, arqExt, new File(arq));
-
-}
-
 
 }

@@ -26,6 +26,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import main.entidade.Cliente;
+
 
 public class Util {
 	private static String secret = "123";
@@ -201,6 +203,43 @@ public class Util {
 		return Long.decode(token);
 	}
     
+	public static void relembrarPassord(Cliente c) {
+
+	      String from = "donotreply@weplay.com";
+	      String host = "localhost";
+	      Properties properties = System.getProperties();
+	      properties.setProperty("mail.smtp.host", host);
+	      Session session = Session.getDefaultInstance(properties);
+
+	      try {
+	         MimeMessage message = new MimeMessage(session);
+
+	         message.setFrom(new InternetAddress(from));
+	         message.addRecipient(Message.RecipientType.TO, new InternetAddress(c.getEmail()));
+
+	         message.setSubject("Confirmation instructions");
+
+	         message.setText("Alguem esta tentando entrar com essa conta. "
+	         		+ "Foi definido um novo password: " + c.getNovoPassword()
+	         		+" Para validar o novo password no link abaixo:\n" + 
+	         		"\n" + 
+	         		"http://54.94.219.84:8080/weplay/json/teste" +//link 
+	         		"\n\n" + 
+	         		"Caso esteja tendo dificuldades com o link, você também pode copiá-lo e colá-lo no seu navegador de internet.\n" + 
+	         		"\n" + 
+	         		"Atenciosamente,\n" + 
+	         		"\n" + 
+	         		"Equipe do WePlay\n" + 
+	         		"\n" + 
+	         		"");
+
+	         Transport.send(message);
+
+	      } catch (MessagingException mex) {
+	         mex.printStackTrace();
+	      }
+	   }
+
 
 	
 

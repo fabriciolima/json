@@ -27,8 +27,10 @@ public class Cliente {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String nome;
+	private String novoNome;
 	private String email;
 	private String password;
+	private String novoPassword;
 	private Integer confirmado;	
 	//@Column(unique=true)
 	private String telefone;
@@ -176,5 +178,21 @@ public class Cliente {
 
 	public void setConfirmado(Integer confirmado) {
 		this.confirmado = confirmado;
+	}
+
+	public String getNovoPassword() {
+		return novoPassword;
+	}
+
+	public void setNovoPassword(String novoPassword) {
+		this.novoPassword = novoPassword;
+	}
+
+	public String getNovoNome() {
+		return novoNome;
+	}
+
+	public void setNovoNome(String novoNome) {
+		this.novoNome = novoNome;
 	}	
 }
